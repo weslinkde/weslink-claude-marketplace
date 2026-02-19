@@ -1,0 +1,1832 @@
+{
+  "provider": "Telekom",
+  "document_version": "1.17",
+  "document_date": "Juli 2021",
+  "formats": {
+    "ELFE": "Elektronische Rechnung Format EDIFACT (Festnetz)",
+    "ELMO": "Elektronische Mobilfunkrechnung",
+    "ELSY": "Elektronische CVS Rechnung",
+    "EVA": "Elektronische Verbindungsdaten Ausgabeformat EDIFACT",
+    "EVM": "Elektronischer Verbindungsnachweis Mobilfunk",
+    "TDN": "Elektronische Rechnung EDIFACT Telekom Designed Network (TTDN)",
+    "MWD": "Elektronische Rechnungen fuer Mehrwertdienste (MWDD/MWDK)",
+    "TSBS": "Elektronische Rechnung EDIFACT fuer TSBS-Vertraege",
+    "WITA": "Elektronische Rechnungen EDIFACT der Fakturierung WITA",
+    "KRSY": "Konvergente Rechnung CVS und TDN der T-Systems",
+    "TNSY": "Elektronische TDN Rechnung T-Systems"
+  },
+  "message_type": "INVOIC",
+  "edifact_directory": "UNTDID 99B",
+  "message_version": "D",
+  "release": "99B",
+  "controlling_agency": "UN",
+  "subset": "ETEB01/ETEB03",
+  "etis_version": "3.0 Rel. B00",
+  "character_set": "Level A (ISO 9735)",
+  "unb_sender_pattern": "D--01<KENNUNG>",
+  "una_string": "UNA:+.?*'",
+  "notes": {
+    "provider_detection": "Identifikation NICHT durch Dateinamen, sondern durch UNB-Segment: Absender beginnt mit 'D--01'. Format-Code steht in DE0020 (z.B. ELMO/0000567) und DE0026 (ELMO, ELFE, etc.)",
+    "iccid_format": "19-stellige ICCID in IMD-Segment, C273.7008(1), Qualifier 06:006:193",
+    "rufnummer_format": "Mobilfunknummer in IMD C272.7081=F88, C273.7009=005:193",
+    "fkto_format": "Fernmeldekonto in IMD C273.7009=88:006:193 (ELFE) oder 06:006:193 (ELMO)"
+  },
+  "segments": {
+    "UNB": {
+      "name": "Interchange Header",
+      "section": "HEADER",
+      "description": "Erstes Segment in einer Uebertragung. Identifiziert den Absender (Telekom) und Empfaenger. Sender-ID beginnt immer mit 'D--01' gefolgt von einer Senderkennung.",
+      "status": "M",
+      "max_occurrences": 1,
+      "elements": {
+        "S001.0001": {
+          "name": "Syntax identifier",
+          "format": "a4",
+          "status": "M",
+          "value": "UNOA",
+          "description": "EDIFACT-Zeichensatz Level A"
+        },
+        "S001.0002": {
+          "name": "Syntax version number",
+          "format": "an1",
+          "status": "M",
+          "value": "4",
+          "description": "EDIFACT-Syntax-Version 4"
+        },
+        "S002.0004": {
+          "name": "Interchange sender identification",
+          "format": "an..35",
+          "status": "M",
+          "pattern": "D--01<KENNUNG>",
+          "examples": {
+            "ELMO": "D--01DTMD1",
+            "ELFE": "D--01RFN022",
+            "EVM": "D--01DTMD1",
+            "ELSY_P02": "D--01T-SYS-ES",
+            "TSBS": "D--01RFN032",
+            "WITA": "D--01RFN033"
+          },
+          "description": "Absenderkennung des Telekom-Providers. Beginnt immer mit 'D--01'. Wichtig fuer Provider-Identifikation."
+        },
+        "S002.0007": {
+          "name": "Identification code qualifier",
+          "format": "an..4",
+          "status": "C",
+          "description": "Qualifikator der Absenderkennung"
+        },
+        "S003.0010": {
+          "name": "Interchange recipient identification",
+          "format": "an..35",
+          "status": "M",
+          "description": "Empfaengerkennung (Kundennummer des Rechnungsempfaengers)"
+        },
+        "S004.0017": {
+          "name": "Date of preparation",
+          "format": "n8",
+          "status": "M",
+          "value_format": "CCYYMMDD",
+          "description": "Datum der Dateierzeugung"
+        },
+        "S004.0019": {
+          "name": "Time of preparation",
+          "format": "n4",
+          "status": "M",
+          "value_format": "HHMM",
+          "description": "Uhrzeit der Dateierzeugung"
+        },
+        "0020": {
+          "name": "Interchange Control Reference",
+          "format": "an..14",
+          "status": "M",
+          "pattern": "<FORMAT_CODE>/<laufende_Nummer_n7>",
+          "examples": {
+            "ELMO": "ELMO/0000567",
+            "ELFE": "ELFE/0000456",
+            "EVA": "EVA/0000457",
+            "EVM": "EVM/0000568",
+            "TTDN": "TTDN/0000002",
+            "MWDD": "MWDD/0000001",
+            "TSBS": "TSBS/0000001",
+            "WITA": "WITA/0000001",
+            "ELSY": "ELSY/4120"
+          },
+          "description": "Referenz der Uebertragung. Format-Code identifiziert den Dokumenttyp (ELMO, ELFE, EVM, etc.). Kann fuer sekundaere Provider-Identifikation verwendet werden."
+        },
+        "0026": {
+          "name": "Application reference",
+          "format": "an..14",
+          "status": "C",
+          "values": {
+            "ELSY": "Elektronische CVS Rechnung",
+            "KRSY": "Konvergente Rechnung CVS und TDN T-Systems",
+            "TNSY": "Elektronische TDN Rechnung",
+            "ELMO": "Elektronische Mobilfunkrechnung",
+            "EVM": "Elektronischer Verbindungsnachweis Mobilfunk",
+            "ELFE": "Elektronische Rechnung EDIFACT Festnetz",
+            "EVA": "Elektronische Verbindungsdaten EDIFACT",
+            "TTDN": "Rechnung TDN",
+            "MWDD": "Anbietervergütungen Mehrwertdienste",
+            "MWDK": "Anbietervergütungen Mehrwertdienste Kredit",
+            "TSBS": "Rechnung TSBS-Vertraege",
+            "WITA": "Rechnung WITA",
+            "SMRT": "Rechnungsbegleitende Unterlagen RBU fuer WITA"
+          },
+          "description": "Dokumentbezeichnung / Formatkennung. Alternativ auch aus DE0020 extrahierbar."
+        },
+        "0035": {
+          "name": "Test indicator",
+          "format": "n1",
+          "status": "C",
+          "value": "1",
+          "description": "Falls '1': Testnachricht"
+        }
+      },
+      "examples": [
+        "UNB+UNOA:4+D--01DTMD1+ELMO123456+20091001:2330+ELMO/0000567'",
+        "UNB+UNOA:4+D--01RFN022+RFN101+20000416:1333+ELFE/0000456'",
+        "UNB+UNOA:4+D--01DTMD1+ELMO123456+20031006:2330+EVM/0000568'"
+      ]
+    },
+    "UNH": {
+      "name": "Message Header",
+      "section": "HEADER",
+      "description": "Erstes Segment in einer Nachricht. Identifiziert den Nachrichtentyp INVOIC und das verwendete Subset (ETEB01=Rechnung, ETEB03=Einzelverbindungsnachweis).",
+      "status": "M",
+      "max_occurrences": 1,
+      "elements": {
+        "0062": {
+          "name": "Message Reference Number",
+          "format": "an..14",
+          "status": "M",
+          "pattern": "<FORMAT_CODE><laufende_Nummer_ab_1>",
+          "examples": {
+            "ELMO": "ELMO0000001",
+            "ELFE": "ELFE0000001",
+            "EVM": "EVM0000001"
+          },
+          "description": "Laufende Nummer der Nachricht innerhalb einer Uebertragung"
+        },
+        "S009.0065": {
+          "name": "Message type",
+          "format": "an..6",
+          "status": "M",
+          "value": "INVOIC",
+          "description": "Nachrichtentyp: immer INVOIC"
+        },
+        "S009.0052": {
+          "name": "Message version number",
+          "format": "an..3",
+          "status": "M",
+          "value": "D",
+          "description": "EDIFACT-Nachrichtenversion"
+        },
+        "S009.0054": {
+          "name": "Message release number",
+          "format": "an..3",
+          "status": "M",
+          "value": "99B",
+          "description": "EDIFACT-Release-Nummer"
+        },
+        "S009.0051": {
+          "name": "Controlling agency",
+          "format": "an..2",
+          "status": "M",
+          "value": "UN",
+          "description": "Normungsorganisation"
+        },
+        "S016.0115": {
+          "name": "Message subset identification",
+          "format": "an..14",
+          "status": "C",
+          "values": {
+            "ETEB01": "Rechnung (Invoice)",
+            "ETEB03": "Einzelverbindungsnachweis (Call Detail Records)"
+          },
+          "description": "Subset-Kennung: ETEB01 fuer Rechnungen, ETEB03 fuer Verbindungsnachweise"
+        },
+        "S016.0116": {
+          "name": "Message subset version number",
+          "format": "an..6",
+          "status": "C",
+          "value": "3",
+          "description": "Subset-Version"
+        },
+        "S016.0118": {
+          "name": "Message subset release number",
+          "format": "an..3",
+          "status": "C",
+          "value": "B00",
+          "description": "Subset-Release"
+        },
+        "S017.0121": {
+          "name": "Message implementation guideline identification",
+          "format": "an..14",
+          "status": "C",
+          "value": "DT",
+          "description": "Telekom-spezifische Implementierungskennung"
+        },
+        "S017.0122": {
+          "name": "Implementation guideline version number",
+          "format": "an..3",
+          "status": "C",
+          "description": "Versionsnummer gemaess Kapitel 1.1 Gueltigkeit (z.B. 1, entspricht Release 1:17)"
+        },
+        "S017.0124": {
+          "name": "Implementation guideline release number",
+          "format": "an..3",
+          "status": "C",
+          "description": "Release-Nummer gemaess Kapitel 1.1 Gueltigkeit (z.B. 17)"
+        },
+        "S017.0051": {
+          "name": "Controlling agency",
+          "format": "an..3",
+          "status": "C",
+          "value": "212",
+          "description": "Telekom-spezifische Agenturnummer"
+        }
+      },
+      "examples": [
+        "UNH+EVM0000001+INVOIC:D:99B:UN+++ETEB03:3:B00+DT:1:17:212'",
+        "UNH+ELFE0000001+INVOIC:D:99B:UN+1234567890+1:C+ETEB01:3:B00+DT:1:17:212'"
+      ]
+    },
+    "BGM": {
+      "name": "Beginning of Message",
+      "section": "HEADER",
+      "description": "Identifiziert die Rechnung: Dokumenttyp-Code und Rechnungsnummer.",
+      "status": "M",
+      "max_occurrences": 1,
+      "elements": {
+        "C002.1001": {
+          "name": "Document name code",
+          "format": "an..3",
+          "status": "C",
+          "values": {
+            "074": "Sonderauswertungen (ELFE, ELSY, KRSY, TNSY)",
+            "130": "Einzelverbindungsnachweis (EVA, EVM)",
+            "190": "Detailuebersicht (ELFE)",
+            "326": "Information zur Sammelrechnung, Infobeleg (ELFE, SMRT)",
+            "380": "Handelsrechnung (ELFE, ELMO, ELSY, TTDN, WITA, KRSY, TNSY)",
+            "381": "Sofortgutschrift (ELFE, ELMO, TTDN, ELFE)",
+            "383": "Sammelrechnungsuebersicht (ELFE)",
+            "385": "Sammelrechnung (ELFE)",
+            "84": "Separate Pre-Notification (ELFE, ELMO)"
+          },
+          "description": "Dokumenttyp-Code"
+        },
+        "C106.1004": {
+          "name": "Document/message number",
+          "format": "an..35",
+          "status": "C",
+          "pattern": "D--01/<Rechnungsnummer>",
+          "description": "Rechnungsnummer im Format 'D--01/<Nr>'"
+        },
+        "1225": {
+          "name": "Message function code",
+          "format": "an..3",
+          "status": "C",
+          "values": {
+            "9": "Original",
+            "7": "Duplikat"
+          },
+          "description": "Status der Rechnung"
+        }
+      },
+      "examples": [
+        "BGM+380+D--01/7030000003+9'",
+        "BGM+380+D--01/00037748576854+9'",
+        "BGM+130+D--01/8943009890+9'"
+      ]
+    },
+    "DTM": {
+      "name": "Date/Time/Period",
+      "section": "HEADER und DETAIL",
+      "description": "Datumsangaben zur Rechnung (Header) oder zur Rechnungsposition/Verbindung (Detail). Format immer 102=CCYYMMDD.",
+      "status": "M",
+      "max_occurrences_header": 10,
+      "elements": {
+        "C507.2005": {
+          "name": "Date/time/period function code qualifier",
+          "format": "an..3",
+          "status": "M",
+          "description": "Qualifikator fuer die Art des Datums"
+        },
+        "C507.2380": {
+          "name": "Date/time/period value",
+          "format": "an..35",
+          "status": "C",
+          "description": "Datumswert"
+        },
+        "C507.2379": {
+          "name": "Date/time/period format code",
+          "format": "an..3",
+          "status": "C",
+          "description": "Datumsformat"
+        }
+      },
+      "qualifiers": {
+        "HEADER_section": {
+          "3": {
+            "description": "Rechnungsdatum (laufende Rechnung)",
+            "format": "102",
+            "value_format": "CCYYMMDD",
+            "context": "HEADER"
+          },
+          "194": {
+            "description": "Rechnungsdatum (erste Rechnung bei Teilsendungen)",
+            "format": "102",
+            "value_format": "CCYYMMDD",
+            "context": "HEADER"
+          },
+          "206": {
+            "description": "Rechnungsdatum (letzte Rechnung bei Teilsendungen)",
+            "format": "102",
+            "value_format": "CCYYMMDD",
+            "context": "HEADER"
+          },
+          "167": {
+            "description": "Beginn der Abrechnungsperiode (Billing Period Start)",
+            "format": "102",
+            "value_format": "CCYYMMDD",
+            "context": "HEADER",
+            "application_use": "billing period start"
+          },
+          "168": {
+            "description": "Ende der Abrechnungsperiode (Billing Period End)",
+            "format": "102",
+            "value_format": "CCYYMMDD",
+            "context": "HEADER",
+            "application_use": "billing period end"
+          }
+        },
+        "DETAIL_section": {
+          "7": {
+            "description": "Datum des Vorgangs (z.B. Datum der Umschaltung, Rechnungsdatum einer Referenz)",
+            "format": "102",
+            "value_format": "CCYYMMDD"
+          },
+          "18": {
+            "description": "Datum des Zugangs",
+            "format": "102",
+            "value_format": "CCYYMMDD"
+          },
+          "36": {
+            "description": "Datum des Wegfalls",
+            "format": "102",
+            "value_format": "CCYYMMDD"
+          },
+          "48": {
+            "description": "Dauer (EVA: Sekunden / EVM: HHMMSS / beide: MMMMSS)",
+            "format": "807/402/405",
+            "value_format": "SEC/HHMMSS/MMMMSS"
+          },
+          "92": {
+            "description": "Vertragsbeginn",
+            "format": "102",
+            "value_format": "CCYYMMDD"
+          },
+          "93": {
+            "description": "Aktuelles Ende Mindestvertragslaufzeit",
+            "format": "102",
+            "value_format": "CCYYMMDD"
+          },
+          "126": {
+            "description": "Vertragsabschluss",
+            "format": "102",
+            "value_format": "CCYYMMDD"
+          },
+          "163": {
+            "description": "Startzeit (z.B. Rufnummergueltigkeit ELMO)",
+            "format": "204",
+            "value_format": "CCYYMMDDHHMMSS"
+          },
+          "164": {
+            "description": "Endzeit",
+            "format": "204",
+            "value_format": "CCYYMMDDHHMMSS"
+          },
+          "173": {
+            "description": "Termine bis",
+            "format": "102",
+            "value_format": "CCYYMMDD"
+          },
+          "194": {
+            "description": "Beginn Abrechnungsperiode / Beginn Nutzungszeitraum (Detail-Ebene)",
+            "format": "102",
+            "value_format": "CCYYMMDD"
+          },
+          "206": {
+            "description": "Ende Abrechnungsperiode / Ende Nutzungszeitraum (Detail-Ebene)",
+            "format": "102",
+            "value_format": "CCYYMMDD"
+          },
+          "326": {
+            "description": "Tarifzeit bei Verbindungsdaten (EVA/EVM)",
+            "format": "entfaellt",
+            "value_format": "z.B. V, GANZTAG, WE"
+          },
+          "559": {
+            "description": "Datum Eingang der Kuendigung",
+            "format": "102",
+            "value_format": "CCYYMMDD"
+          },
+          "667": {
+            "description": "Kuendigungsfrist",
+            "format": "801/802/804",
+            "value_format": "Jahr(e)/Monat(e)/Tag(e)"
+          },
+          "699": {
+            "description": "Vertragsabnahme",
+            "format": "102",
+            "value_format": "CCYYMMDD"
+          }
+        }
+      },
+      "examples": [
+        "DTM+3:20091030:102'",
+        "DTM+167:20091001:102'",
+        "DTM+168:20091028:102'"
+      ]
+    },
+    "NAD": {
+      "name": "Name and Address",
+      "section": "HEADER und DETAIL",
+      "description": "Adress- und Identifikationsangaben zu verschiedenen Parteien. Der Qualifier (DE3035) bestimmt die Rolle.",
+      "qualifiers": {
+        "SE": {
+          "description": "Basis-Serviceprovider (Rechnungsversender / Telekom)",
+          "context": "HEADER",
+          "elements": {
+            "C082.3039": {
+              "name": "Party identifier",
+              "values": {
+                "DEU01": "Telekom Deutschland GmbH (Festnetz)",
+                "MOB": "Telekom Deutschland GmbH (Mobilfunk)",
+                "DTS": "T-Systems"
+              }
+            },
+            "C082.1131": {
+              "name": "Code list identification code",
+              "value": "003",
+              "description": "Code-Liste ETIS (nicht bei T-Systems)"
+            },
+            "C082.3055": {
+              "name": "Code list responsible agency code",
+              "value": "193",
+              "description": "ETIS (nicht bei T-Systems)"
+            },
+            "C080.3036": {
+              "name": "Party name",
+              "examples": [
+                "TELEKOM DEUTSCHLAND GMBH"
+              ]
+            }
+          },
+          "examples": [
+            "NAD+SE+DEU01:003:193++TELEKOM DEUTSCHLAND GMBH:MUSTERSTADT:::751+9999+MUSTERSTADT++12345+DE'",
+            "NAD+SE+MOB:003:193++TELEKOM DEUTSCHLAND GMBH+LANDGRABENWEG:151+BONN++53227+DE'"
+          ]
+        },
+        "BY": {
+          "description": "Vertragspartner (nur ELMO, falls nicht identisch mit Rechnungsempfaenger)",
+          "context": "HEADER",
+          "elements": {
+            "C082.3039": {
+              "name": "Kundennummer",
+              "description": "Bei ELSY: SAP-Vertragspartnernummer"
+            }
+          },
+          "examples": [
+            "NAD+BY+12345678+MANFRED MUSTERMANN:MUSTERSTRASSE 1:12345:MUSTERSTADT'",
+            "NAD+BY+12345678++MANFRED MUSTERMANN+MUSTERSTRASSE 1+MUSTERSTADT++12345+DE'"
+          ]
+        },
+        "IV": {
+          "description": "Rechnungsempfaenger (Invoice recipient)",
+          "context": "HEADER",
+          "elements": {
+            "C082.3039": {
+              "name": "Kundennummer",
+              "description": "Kundennummer des Rechnungsempfaengers"
+            }
+          },
+          "examples": [
+            "NAD+IV+12345678+MANFRED MUSTERMANN:MUSTERSTRASSE 1:12345:MUSTERSTADT'",
+            "NAD+IV+12345678++MANFRED MUSTERMANN+MUSTERSTRASSE 1+MUSTERSTADT++12345+DE'"
+          ]
+        },
+        "HL": {
+          "description": "Abweichender EVN-Empfaenger (fuer Einzelverbindungsnachweis, EVM)",
+          "context": "HEADER",
+          "elements": {
+            "C082.3039": {
+              "name": "Kundennummer des abweichenden EVN-Empfaengers"
+            }
+          },
+          "examples": [
+            "NAD+HL+2883778962++ROBERT MUSTERMANN+MUSTERSTRASSE 7+MUSTERSTADT++13468+DE'"
+          ]
+        },
+        "PK": {
+          "description": "Auskunftsstelle / Ansprechpartner des Basis-Serviceproviders",
+          "context": "HEADER",
+          "examples": [
+            "NAD+PK+++TELEKOM DEUTSCHLAND GMBH:KUNDENSERVICE:GESCHAEFTSKUNDEN+POSTFACH 300464+BONN++53184+DE'"
+          ]
+        },
+        "DP": {
+          "description": "Dienstenutzer (ELMO): Kostenstelle und Benutzer eines Mobilfunk-Teilnehmers",
+          "context": "DETAIL",
+          "elements": {
+            "C082.3039": {
+              "name": "Kostenstelle"
+            },
+            "C080.3036": {
+              "name": "Dienstenutzer (Name)"
+            }
+          },
+          "examples": [
+            "NAD+DP+KST-748'",
+            "NAD+DP+123++MARKUS MUSTERMANN'"
+          ]
+        },
+        "SU": {
+          "description": "Service Provider / 3rd Party Partner (ELFE/ELSY/ELMO in Detail-Section)",
+          "context": "DETAIL",
+          "elements": {
+            "C082.3039": {
+              "name": "Netzbetreiberkennzahl",
+              "description": "Carrier-Code des Providers"
+            }
+          },
+          "examples": [
+            "NAD+SU+01019+MOBILCOM'",
+            "NAD+SU++3PP ANBIETER:MUSTERSTRASSE 1:12345 MUSTERSTADT'"
+          ]
+        },
+        "P1": {
+          "description": "Endstelle A (WITA/KRSY/TNSY)",
+          "context": "DETAIL",
+          "examples": [
+            "NAD+P1+++MUSTER GMBH+MUSTERSTR A+BERLIN++12277+DE'"
+          ]
+        },
+        "P2": {
+          "description": "Endstelle B (WITA/KRSY/TNSY)",
+          "context": "DETAIL",
+          "examples": [
+            "NAD+P1+++MUSTER GMBH+MUSTERSTR B+BERLIN++12277+DE'"
+          ]
+        }
+      }
+    },
+    "RFF": {
+      "name": "Reference",
+      "section": "HEADER und DETAIL",
+      "description": "Referenz- und Nummernangaben. Der Qualifier (DE1153) bestimmt die Art der Referenz.",
+      "structure": {
+        "C506.1153": "Reference function code qualifier (Qualifikator)",
+        "C506.1154": "Reference identifier (Referenzwert)"
+      },
+      "qualifiers": {
+        "HEADER_section": {
+          "ADE": {
+            "description": "Buchungskonto (ELFE/EVA) bzw. Kundenkonto (ELMO/EVM) bzw. Kundenreferenznummer (ELSY)",
+            "context": "HEADER (SG1)",
+            "application_use": "account number",
+            "examples": [
+              "RFF+ADE:4903213451'",
+              "RFF+ADE:0000003213451'"
+            ]
+          },
+          "ACE": {
+            "description": "Nummer der monatlichen Rechnung",
+            "context": "HEADER (SG1)",
+            "formats": [
+              "ELFE"
+            ]
+          },
+          "ADT": {
+            "description": "Buchungskonto der Sammelrechnung/Sammelrechnungsuebersicht",
+            "context": "HEADER (SG1)",
+            "formats": [
+              "ELFE"
+            ]
+          },
+          "AFL": {
+            "description": "Rechnungsnummer der Sammelrechnung/Sammelrechnungsuebersicht",
+            "context": "HEADER (SG1)",
+            "formats": [
+              "ELFE"
+            ]
+          },
+          "PQ": {
+            "description": "Verwendungszweck (letzte Ziffer ist Pruefziffer nach ISO 7064)",
+            "context": "HEADER (SG1)",
+            "formats": [
+              "ELMO",
+              "KRSY",
+              "TNSY"
+            ],
+            "examples": [
+              "RFF+PQ:3213451000030'"
+            ]
+          },
+          "IV": {
+            "description": "Zugehoerige Rechnungsnummer (EVM)",
+            "context": "HEADER (SG1)",
+            "formats": [
+              "EVM"
+            ],
+            "examples": [
+              "RFF+IV:10006100000030'"
+            ]
+          },
+          "AHM": {
+            "description": "Mandatsreferenz-ID (SEPA-Lastschrift)",
+            "context": "HEADER (SG3, Rechnungsempfaenger)",
+            "formats": [
+              "ELFE",
+              "ELMO",
+              "ELSY",
+              "KRSY",
+              "TNSY"
+            ],
+            "examples": [
+              "RFF+AHM:568945783893545'"
+            ]
+          },
+          "FC": {
+            "description": "Steuernummer des Basis-Serviceproviders",
+            "context": "HEADER (SG3, Basis-Serviceprovider)",
+            "examples": [
+              "RFF+FC:205/5777/0518'"
+            ]
+          },
+          "VA": {
+            "description": "Umsatzsteuer-ID (des Basis-Serviceproviders oder Vertragspartners)",
+            "context": "HEADER",
+            "examples": [
+              "RFF+VA:DE 122265872'"
+            ]
+          },
+          "AHO": {
+            "description": "Gerichtsstand, Handelsregistereintrag",
+            "context": "HEADER (SG3, Basis-Serviceprovider)",
+            "examples": [
+              "RFF+AHO:AMTSGERICHT BONN HRB 5919'"
+            ]
+          },
+          "ALV": {
+            "description": "Sitz der Gesellschaft",
+            "context": "HEADER (SG3, Basis-Serviceprovider)",
+            "examples": [
+              "RFF+ALV:SITZ DER GESELLSCHAFT BONN'"
+            ]
+          },
+          "XA": {
+            "description": "WEEE-Registrierungsnummer",
+            "context": "HEADER (SG3, Basis-Serviceprovider)",
+            "examples": [
+              "RFF+XA:DE 60800328'"
+            ]
+          },
+          "ZZZ": {
+            "description": "Angaben zum Inkasso",
+            "context": "HEADER (SG3, Basis-Serviceprovider)",
+            "formats": [
+              "ELFE",
+              "EVA"
+            ]
+          },
+          "AHL": {
+            "description": "Glaeubiger-ID des Basis-Serviceproviders",
+            "context": "HEADER (SG3, Basis-Serviceprovider)",
+            "examples": [
+              "RFF+AHL:DE93ZZZ00000078611'"
+            ]
+          }
+        },
+        "DETAIL_section": {
+          "CT": {
+            "description": "Vertragsnummer (TDN/ELFE/WITA)",
+            "context": "DETAIL (SG30, Hierarchiestufe 0 oder 1)",
+            "application_use": "contract number",
+            "formats": [
+              "TDN",
+              "ELFE",
+              "WITA"
+            ],
+            "examples": [
+              "RFF+CT:123456'",
+              "RFF+CT:12345'"
+            ]
+          },
+          "ADE": {
+            "description": "Buchungskonto (bei Sammelrechnungen in Detail-Section)",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "ELFE"
+            ],
+            "examples": [
+              "RFF+ADE:4903213451'"
+            ]
+          },
+          "CO": {
+            "description": "Kundenreferenznummer / Externe Auftragsnummer",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "ELSY",
+              "WITA"
+            ]
+          },
+          "ANK": {
+            "description": "Carriercode",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "ELFE"
+            ]
+          },
+          "ABO": {
+            "description": "Geschaeftsfall",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "ELFE"
+            ]
+          },
+          "ADJ": {
+            "description": "Company-ID",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "ELFE"
+            ]
+          },
+          "INN": {
+            "description": "Rufnummer nach der Umschaltung",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "ELFE"
+            ]
+          },
+          "INO": {
+            "description": "Rufnummer vor der Umschaltung",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "ELFE"
+            ]
+          },
+          "IV": {
+            "description": "Rechnungsnummer (bei Gutschriften, auf die sich diese Rechnung bezieht)",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "ELFE",
+              "ELSY"
+            ],
+            "examples": [
+              "RFF+IV:690002345678'"
+            ]
+          },
+          "AGY": {
+            "description": "Globale Referenznummer (Verbindung zum Auskunftssystem)",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "ELFE"
+            ]
+          },
+          "LI": {
+            "description": "Leitungsbezeichnung des Vorproduktes",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "WITA"
+            ]
+          },
+          "AMH": {
+            "description": "Stoerungsnummer",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "WITA"
+            ]
+          },
+          "AKQ": {
+            "description": "Kundenindividuelle Referenznummer",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "ELFE",
+              "ELSY"
+            ]
+          },
+          "AWE": {
+            "description": "Lokationsvertragsnummer (KRSY TDN-Anteil und TNSY)",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "KRSY",
+              "TNSY"
+            ]
+          },
+          "ON": {
+            "description": "Bestellnummer Warenempfaenger",
+            "context": "DETAIL (SG30)",
+            "formats": [
+              "ELFE",
+              "ELSY"
+            ]
+          },
+          "FC": {
+            "description": "Steuernummer fuer 3rd Party Anbieter",
+            "context": "DETAIL (SG30, Hierarchiestufe 2, ELMO)",
+            "formats": [
+              "ELMO"
+            ],
+            "examples": [
+              "RFF+FC:99/999/99999'"
+            ]
+          }
+        }
+      }
+    },
+    "LIN": {
+      "name": "Line Item",
+      "section": "DETAIL",
+      "description": "Identifiziert eine Rechnungszeile oder Gruppe zusammengehoerender Rechnungszeilen. Definiert die Hierarchiestufe (configuration level).",
+      "status": "M",
+      "max_occurrences": 9999999,
+      "elements": {
+        "1082": {
+          "name": "Line item number",
+          "format": "an..6",
+          "status": "C",
+          "description": "Laufende Nummer des LIN-Segments"
+        },
+        "C829.5495": {
+          "name": "Sub-line indicator",
+          "format": "an..3",
+          "status": "C",
+          "description": "Unterpositionsindikator"
+        },
+        "C829.1082": {
+          "name": "Line item number (parent)",
+          "format": "an..6",
+          "status": "C",
+          "description": "Laufende Nummer der naechsthoeheren Hierarchiestufe"
+        },
+        "1222": {
+          "name": "Configuration level",
+          "format": "n..2",
+          "status": "C",
+          "description": "Nummer der Hierarchiestufe (0=Toplevel)"
+        }
+      },
+      "hierarchy_levels": {
+        "ELFE_EVA_Festnetz": {
+          "0": "FKTO/Vertragsnummer (Fernmeldekonto)",
+          "1": "Rufnummer oder Kennung",
+          "2": "Nutzerkennung / Gruppe von Rechnungspositionen",
+          "3": "Rechnungsabschnitt / Rechnungsposition"
+        },
+        "ELMO_EVM_Mobilfunk": {
+          "0": "Teilnehmerverhältnis (Karten-/Profilnummer)",
+          "1": "Rufnummer oder Kennung",
+          "2": "Gruppe von Rechnungspositionen",
+          "3": "Rechnungsabschnitt / Rechnungsposition"
+        },
+        "TDN_TTDN": {
+          "0": "Vertragsnummer",
+          "1": "Vertragsnachtragsnummer",
+          "2": "Rechnungsabschnitt",
+          "3": "Rechnungsposition"
+        },
+        "MWD_Mehrwertdienste": {
+          "0": "FKTO",
+          "1": "Servicerufnummer",
+          "2": "Rechnungsabschnitt",
+          "3": "Rechnungsposition"
+        },
+        "EVA_EVM_Verbindungsdaten": {
+          "0": "FKTO",
+          "1": "Nutzerkennung oder Rufnummer",
+          "2": "Gruppe von Verbindungen / Rechnungsabschnitt",
+          "3": "Verbindungen"
+        }
+      },
+      "examples": [
+        "LIN+7+++:6+2'"
+      ]
+    },
+    "IMD": {
+      "name": "Item Description",
+      "section": "DETAIL",
+      "description": "Beschreibungs-Segment mit verschiedenen Qualifier-Kombinationen. KRITISCH fuer Vertragszuordnung: enthaelt SIM-Karten-Nummern (ICCID), Mobilfunknummern, Fernmeldekonten und Produktcodes.",
+      "max_occurrences": 99,
+      "structure_note": "IMD+<7077>+<C272>+<C273>. C273 besteht aus: 7009:1131:3055:7008(1):7008(2). Der Schluessel zur Interpretation ist die Kombination aus 7077 (F/C), C272.7081 (Item-Characteristic) und C273.7009:1131:3055 (Code aus Codeliste).",
+      "elements": {
+        "7077": {
+          "name": "Item description type",
+          "format": "an..3",
+          "values": {
+            "F": "Freier Text",
+            "C": "Code aus Codeliste"
+          }
+        },
+        "C272.7081": {
+          "name": "Item characteristic code",
+          "format": "an..3",
+          "description": "Charakteristik des Items"
+        },
+        "C273.7009": {
+          "name": "Item description identifier",
+          "format": "an..17",
+          "description": "Code aus einer spezifischen Codeliste. Zusammen mit 1131 und 3055 ergibt sich der vollstaendige Qualifier."
+        },
+        "C273.1131": {
+          "name": "Code list identification code",
+          "format": "an..3",
+          "description": "Identifikationsnummer der verwendeten Codeliste"
+        },
+        "C273.3055": {
+          "name": "Code list responsible agency code",
+          "format": "an..3",
+          "description": "Verantwortliche Agentur der Codeliste. '193' = ETIS, '212' = Deutsche Telekom"
+        },
+        "C273.7008_1": {
+          "name": "Item description (1)",
+          "format": "an..256",
+          "description": "Erster Datenwert (z.B. ICCID/FKTO/Profilnummer)"
+        },
+        "C273.7008_2": {
+          "name": "Item description (2)",
+          "format": "an..256",
+          "description": "Zweiter Datenwert (z.B. Karten-/Profiltext, Hauptrufnummer, Vertragsnummer)"
+        }
+      },
+      "qualifiers": {
+        "hierarchy_0_iccid_fkto": {
+          "title": "Hierarchiestufe 0: Fernmeldekonto / SIM-Karten-Nummer / Profilnummer (ELMO/ELFE/EVA)",
+          "7077": "F",
+          "C273.7009_pattern": "06:006:193 (ELMO/SIM) oder 88:006:193 (ELFE/FKTO)",
+          "codeliste": "Service Access Point Types code list (006), Agentur 193 (ETIS)",
+          "C273.7008_1": {
+            "ELMO": "SIM-Kartennummer (ICCID, 19-stellig) oder Profilnummer",
+            "ELFE": "FKTO (Fernmeldekonto/Buchungskonto)",
+            "EVA": "FKTO"
+          },
+          "C273.7008_2": {
+            "ELMO": "Karten-/Profiltext: TNN (normal), TTC/<Nr> (TwinCard), TTB/<Nr> (TwinBill), VPN, PVN, SLA, MSC (MultiSIM)",
+            "ELFE": "Hauptrufnummer (optional) oder Vertragsnummer (WITA)",
+            "WITA": "Vertragsnummer",
+            "TSBS": "Vertragsnummer (C273.7008(1) leer)"
+          },
+          "application_use": "SIM number (ELMO) / account number (ELFE)",
+          "examples": [
+            "IMD+F++06:006:193:89490200000123456781:TNN'",
+            "IMD+F++06:006:193:89490200000123456711:TTC/89490200000123456721'",
+            "IMD+F++06:006:193:01234569:PVN'",
+            "IMD+F++06:006:193:8949020000012345631:MSC'",
+            "IMD+F++88:006:193:615109079976'",
+            "IMD+F++88:006:193:615100079976:615100079976'",
+            "IMD+F++88:006:193:511100001234:1234567890'"
+          ]
+        },
+        "hierarchy_1_rufnummer_kennung": {
+          "title": "Hierarchiestufe 1: Rufnummer / Kennung (ELMO/ELFE/EVA)",
+          "7077": "F",
+          "C272.7081": "F88 (ELMO/EVM) oder B01/Z88 (ELFE/EVA/ELSY) oder C88 (WITA)",
+          "C273.7009_pattern": "005:193",
+          "codeliste": "Service Access Point Types code list (005), Agentur 193 (ETIS)",
+          "C273.7008_1": {
+            "ELMO_EVM": "Mobilfunknummer im Format (0171)1234567 oder SMS",
+            "ELFE_EVA": "Rufnummer (z.B. 251109742172 = Ortsvorwahl+Nummer)",
+            "ELSY": "Rufnummer"
+          },
+          "C273.7008_2": {
+            "ELMO": "Text zur Rufnummer (z.B. TELEFONIE)",
+            "ELFE_EVA": "Waehlbare Rufnummer (formatiert)"
+          },
+          "application_use": "phone number",
+          "examples": [
+            "IMD+F++F88:005:193:(0171)1234567:TELEFONIE'",
+            "IMD+F++F88:005:193:SMS'",
+            "IMD+F++B01:005:193:251109742172:(02 51) 9 74 21 72'",
+            "IMD+F++B01:005:193:251109742172'",
+            "IMD+F++Z88:005:193:06891/801638'"
+          ]
+        },
+        "hierarchy_1_twincard": {
+          "title": "TwinCard-Rufnummern (ELMO Hierarchiestufe 1)",
+          "note": "Zwei aufeinanderfolgende IMD-Segmente: erstes fuer Hauptrufnummer, zweites mit TWINCARD-Kennung",
+          "examples": [
+            "IMD+F++F88:005:193:(0171)1234570:TELEFONIE'",
+            "IMD+F++F88:005:193:TWINCARD'"
+          ]
+        },
+        "hierarchy_2_klassifikation": {
+          "title": "Hierarchiestufe 2: Klassifikationsnummer / Gruppierung von Rechnungspositionen",
+          "7077": "C",
+          "C273.7009_pattern": "01:004:193 (ELMO) oder 02:004:193 (ELFE/EVA/ELSY)",
+          "codeliste": "Charge Types code list (004), Agentur 193 (ETIS)",
+          "C273.7008_1": {
+            "ELFE_EVA_ELSY": "Gebührengruppe (z.B. 55)",
+            "ELMO": "Klassifikationsnummer (12-stellig, z.B. 000110200010)"
+          },
+          "examples": [
+            "IMD+C++02:004:193:55'",
+            "IMD+C++01:004:193:000110200010'"
+          ]
+        },
+        "hierarchy_2_gruppentext": {
+          "title": "Hierarchiestufe 2: Rechnungstext einer Gruppierung",
+          "7077": "F",
+          "C273.7009_pattern": "01:004:193 oder 02:004:193",
+          "C273.7008_1": "Gruppentext",
+          "examples": [
+            "IMD+F++01:004:193:MONATLICHE PREISE'",
+            "IMD+F++02:004:193:VERBINDUNGEN ZU SONDERRUFNUMMERN'"
+          ]
+        },
+        "hierarchy_3_produktkennung": {
+          "title": "Hierarchiestufe 3: Produktkennung (Artikel- und Leistungsnummer / Klassifikationsnummer)",
+          "7077": "C",
+          "C273.7009_pattern": "01:004:193 (ELFE/ELMO) oder 88:004:193 (ELSY/TNSY/KRSY)",
+          "codeliste": "Charge Types code list (004), Agentur 193 (ETIS)",
+          "C273.7008_1": {
+            "ELFE": "Artikel- und Leistungsnummer (z.B. 10110)",
+            "ELMO": "Klassifikationsnummer (z.B. 000110000010)",
+            "ELSY_TNSY_KRSY": "SAP-Materialnummer (z.B. 20085013)"
+          },
+          "examples": [
+            "IMD+C++01:004:193:10110'",
+            "IMD+C++01:004:193:000110000010'",
+            "IMD+C++88:004:193:20085013'"
+          ]
+        },
+        "hierarchy_3_produkttext": {
+          "title": "Hierarchiestufe 3: Produkttext (Freitext-Beschreibung)",
+          "7077": "F",
+          "C273.7009_pattern": "01:004:193 (ELFE/ELMO) oder 88:004:193 (ELSY)",
+          "C273.7008_1": "Produkttext",
+          "examples": [
+            "IMD+F++01:004:193:TELEFONANSCHLUSS'",
+            "IMD+F++01:004:193:BUSINESSPROFIANSCHLUSS'",
+            "IMD+F++88:004:193:LOKATIONSZUGANG N2 DSS1 ANLAGEN-AS'"
+          ]
+        },
+        "hierarchy_3_dienstekennzeichen": {
+          "title": "Hierarchiestufe 3: Dienstekennzeichen (nur ELFE)",
+          "7077": "C",
+          "C273.7009_pattern": "CA:001:212",
+          "codeliste": "Telekom-Codeliste (001), Agentur 212 (Deutsche Telekom)",
+          "examples": [
+            "IMD+C++CA:001:212'"
+          ]
+        },
+        "hierarchy_3_tarifzone": {
+          "title": "Hierarchiestufe 3: Tarifzone (EVA/EVM)",
+          "7077": "C",
+          "C273.7009_pattern": "W001:003:212",
+          "codeliste": "Tarifzonencodes (003), Agentur 212 (Deutsche Telekom)",
+          "C273.7008_1": "Tarifzonentext",
+          "examples": [
+            "IMD+C++W001:003:212:DEU'"
+          ]
+        },
+        "hierarchy_3_verbindungsinfo": {
+          "title": "Hierarchiestufe 3: Zusatzinformationen einer Verbindung (EVA/EVM)",
+          "7077": "C",
+          "C273.7009_pattern": "XX:002:212 (EVA) oder XX:101:212 (EVM)",
+          "codeliste": "Telekom-Codeliste (002/101), Agentur 212",
+          "examples": [
+            "IMD+C++AW:002:212'",
+            "IMD+C++T:101:212'",
+            "IMD+C++L:101:212'",
+            "IMD+C++APN:101:212:T-INTERNET'",
+            "IMD+C++VSMSC:101:212:491710760020'"
+          ]
+        },
+        "hierarchy_3_zusatzinfo_elsy": {
+          "title": "Hierarchiestufe 3: Zusatzinformation zur Rechnungsposition (nur ELSY)",
+          "7077": "F",
+          "C273.7009_pattern": "99:004:193",
+          "examples": [
+            "IMD+F++99:004:193:16 EINZELVERBINDUNGEN'",
+            "IMD+F++99:004:193:4,00% VON 0,20 EUR (AUS 03.2005)'"
+          ]
+        },
+        "hierarchy_3_folgenummer": {
+          "title": "Hierarchiestufe 3: Folgenummer einer Verbindung (nur EVA)",
+          "7077": "C",
+          "C273.7009_pattern": "1:031:212",
+          "codeliste": "Telekom-Codeliste (031), Agentur 212",
+          "examples": [
+            "IMD+C++1:031:212'"
+          ]
+        },
+        "hierarchy_3_informationsposition": {
+          "title": "Hierarchiestufe 3: Bezeichnung zu Informationspositionen (ELFE)",
+          "7077": "C",
+          "C273.7009_pattern": "BC3:011:212",
+          "codeliste": "Telekom-Codeliste (011), Agentur 212",
+          "examples": [
+            "IMD+C++BC3:011:212:ERSPARNIS DES BC-VERTRAGES'"
+          ]
+        },
+        "hierarchy_1_produktparameter_tnsy_krsy": {
+          "title": "Hierarchiestufe 1: Produktparameter (TNSY und KRSY TDN-Anteil)",
+          "7077": "F",
+          "C273.7009_pattern": "ZATWTB:201:212",
+          "codeliste": "Produktparameter-Codeliste (201), Agentur 212",
+          "examples": [
+            "IMD+C++ZATWTB:201:212:COMFORT'"
+          ]
+        },
+        "hierarchy_3_wita_materialnummer": {
+          "title": "Hierarchiestufe 3: WITA/TSBS Materialnummer und Konditions-ID",
+          "7077": "C",
+          "C273.7009_pattern": "01:033:212",
+          "C273.7008_1": "Materialnummer",
+          "C273.7008_2": "Konditions-ID",
+          "examples": [
+            "IMD+C++01:033:212:12345678:6543212345'",
+            "IMD+C++01:033:212:12345678'"
+          ]
+        }
+      }
+    },
+    "MOA": {
+      "name": "Monetary Amount",
+      "section": "DETAIL und SUMMARY",
+      "description": "Betragsangaben auf Positionsebene (Detail) oder als Rechnungssummen (Summary). Betraege koennen Vorzeichen, Dezimalpunkt und bis zu 4 Dezimalstellen haben.",
+      "structure": {
+        "C516.5025": "Monetary amount type code qualifier (Betragsqualifikator)",
+        "C516.5004": "Monetary amount value (Betrag, n..35)",
+        "C516.6345": "Currency identification code (z.B. EUR)",
+        "C516.6343": "Currency qualifier",
+        "C516.4405": "Status description code (9 = nur informativer Betrag, kein Zahlbetrag)"
+      },
+      "qualifiers": {
+        "DETAIL_section": {
+          "38": {
+            "description": "Betrag pro Rechnungsposition bzw. Verbindung",
+            "context": "DETAIL (SG27)",
+            "formats": [
+              "alle"
+            ],
+            "application_use": "Primärer Positionsbetrag"
+          },
+          "160": {
+            "description": "Bereitstellungsentgelt, Zuschlaege fuer eine Verbindung",
+            "context": "DETAIL (SG27)",
+            "formats": [
+              "EVA"
+            ]
+          },
+          "264": {
+            "description": "Andere Telekom Deutschland GmbH Leistungen (brutto)",
+            "context": "DETAIL (SG27)",
+            "formats": [
+              "ELMO"
+            ]
+          },
+          "132": {
+            "description": "Leistungen 3rd Party Anbieter (brutto)",
+            "context": "DETAIL (SG27)",
+            "formats": [
+              "ELMO",
+              "EVM",
+              "ELFE"
+            ]
+          },
+          "25": {
+            "description": "Rabattfaehiger Betrag (in SG42)",
+            "context": "DETAIL (SG42)"
+          },
+          "Tnn": {
+            "description": "Telekom-spezifische Betraege (z.B. T01, T11)",
+            "context": "DETAIL (SG27)",
+            "formats": [
+              "ELFE"
+            ],
+            "note": "Nur zur Information (4405=9)"
+          }
+        },
+        "SUMMARY_section": {
+          "9": {
+            "description": "Zu zahlender Betrag laut Rechnung (Bruttobetrag)",
+            "context": "SUMMARY (SG50)",
+            "formats": [
+              "alle"
+            ],
+            "application_use": "invoice gross amount"
+          },
+          "77": {
+            "description": "Bruttobetrag",
+            "context": "SUMMARY (SG50)",
+            "formats": [
+              "alle"
+            ]
+          },
+          "79": {
+            "description": "Nettobetrag (Summe ueber alle Verbindungen bei EVA/EVM)",
+            "context": "SUMMARY (SG50)",
+            "formats": [
+              "alle"
+            ],
+            "application_use": "invoice net amount"
+          },
+          "124": {
+            "description": "Umsatzsteuerbetrag",
+            "context": "SUMMARY (SG50)",
+            "formats": [
+              "alle"
+            ],
+            "application_use": "tax amount"
+          },
+          "125": {
+            "description": "Umsatzsteuerpflichtiger Betrag (Nettobetrag)",
+            "context": "SUMMARY (SG50)",
+            "formats": [
+              "alle"
+            ]
+          },
+          "136": {
+            "description": "Uebertrag aus vorheriger Rechnung",
+            "context": "SUMMARY (SG50)",
+            "formats": [
+              "alle"
+            ]
+          },
+          "T91": {
+            "description": "Betrag fuer bestehende Ratenzahlungsvereinbarungen",
+            "context": "SUMMARY (SG50)",
+            "formats": [
+              "ELFE"
+            ]
+          },
+          "T92": {
+            "description": "Betrag fuer neue Ratenzahlungsvereinbarungen",
+            "context": "SUMMARY (SG50)",
+            "formats": [
+              "ELFE"
+            ]
+          },
+          "264": {
+            "description": "Leistungen der Telekom Deutschland GmbH",
+            "context": "SUMMARY (SG50)",
+            "formats": [
+              "ELMO"
+            ]
+          },
+          "132": {
+            "description": "Leistungen 3rd Party Anbieter",
+            "context": "SUMMARY (SG50)",
+            "formats": [
+              "ELMO",
+              "EVM",
+              "ELFE"
+            ]
+          },
+          "211": {
+            "description": "Lastschriftbetrag",
+            "context": "SUMMARY (SG50)",
+            "formats": [
+              "ELFE",
+              "ELMO",
+              "ELSY",
+              "KRSY",
+              "TNSY"
+            ]
+          }
+        }
+      },
+      "examples": [
+        "MOA+38:323.2315'",
+        "MOA+38:3.11'",
+        "MOA+38:1253.76::9'",
+        "MOA+9:109.72'",
+        "MOA+79:94.59'",
+        "MOA+124:15.13'",
+        "MOA+125:94.59'",
+        "MOA+211:109.72'",
+        "MOA+264:5.00'",
+        "MOA+132:34.65'"
+      ]
+    },
+    "QTY": {
+      "name": "Quantity",
+      "section": "DETAIL",
+      "description": "Mengenangaben zu Rechnungspositionen (Verbindungsminuten, SMS, Datenvolumen etc.).",
+      "max_occurrences": 5,
+      "structure": {
+        "C186.6063": "Quantity type code qualifier (Mengenbezeichnung)",
+        "C186.6060": "Quantity (Menge, an..35, mit möglichem Minuszeichen und bis 4 Dezimalstellen)",
+        "C186.6411": "Measurement unit code (Mengeneinheit)"
+      },
+      "quantity_type_qualifiers": {
+        "3": {
+          "description": "Bestandsveraenderung positiv (Zugang)",
+          "formats": [
+            "ELFE",
+            "ELMO"
+          ]
+        },
+        "61": {
+          "description": "Bestandsveraenderung negativ (Wegfall)",
+          "formats": [
+            "ELFE",
+            "ELMO"
+          ]
+        },
+        "107": {
+          "description": "Einheiten (Standardmengenangabe)",
+          "formats": [
+            "alle"
+          ]
+        },
+        "129": {
+          "description": "Einheiten bei mengenabhaengigen Preisen",
+          "formats": [
+            "ELFE"
+          ]
+        },
+        "130": {
+          "description": "Bonuseinheiten",
+          "formats": [
+            "ELFE",
+            "ELMO"
+          ]
+        },
+        "133": {
+          "description": "Verbrauchtes Budget",
+          "formats": [
+            "ELFE",
+            "ELMO"
+          ]
+        },
+        "134": {
+          "description": "Neues Budget",
+          "formats": [
+            "ELFE",
+            "ELMO"
+          ]
+        },
+        "143": {
+          "description": "Nicht verbrauchtes Budget",
+          "formats": [
+            "ELFE",
+            "ELMO"
+          ]
+        }
+      },
+      "unit_codes": {
+        "SEC": "Sekunden",
+        "PCE": "Tarifeinheiten / Einheiten",
+        "CO": "Anzahl der Gespraeche",
+        "2P": "Kilobyte",
+        "4L": "Megabyte",
+        "12": "Cells",
+        "SG": "Segmente",
+        "MIN": "Minuten",
+        "HUR": "Stunden",
+        "DAY": "Tage",
+        "NAR": "Allgemeine Mengeneinheit",
+        "QA": "Seiten (bei Telefaxen)",
+        "GB": "Gigabyte"
+      },
+      "examples": [
+        "QTY+107:1:NAR'",
+        "QTY+107:501:PCE'",
+        "QTY+107:65:SEC'",
+        "QTY+107:10:CO'",
+        "QTY+130:2400:SEC'",
+        "QTY+107:2.235:NAR'"
+      ]
+    },
+    "TAX": {
+      "name": "Duty/Tax/Fee Details",
+      "section": "HEADER und DETAIL und SUMMARY",
+      "description": "Umsatzsteuerangaben. Qualifier 5283 unterscheidet Kontext: '9'=Standard Rechnung (Header), '1'=Positionssteuersatz (Detail), '3'=Umsatzsteuerteilsatz (Summary).",
+      "elements": {
+        "5283": {
+          "name": "Duty/tax/fee function qualifier",
+          "format": "an..3",
+          "values": {
+            "9": "Standard-Umsatzsteuersatz der gesamten Rechnung (Header SG6)",
+            "1": "Umsatzsteuersatz der Rechnungsposition (Detail SG34)",
+            "3": "Umsatzsteuerteilsatz der Rechnung (Summary SG52)"
+          }
+        },
+        "C241.5153": {
+          "name": "Duty/tax/fee type name code",
+          "values": {
+            "VAT": "Umsatzsteuer",
+            "FRE": "Umsatzsteuerfrei"
+          }
+        },
+        "C243.5278": {
+          "name": "Duty/tax/fee rate",
+          "format": "an..17",
+          "value_format": "99.9 (Prozentsatz)",
+          "examples": [
+            "19.0",
+            "0.0",
+            "7.0"
+          ]
+        },
+        "5305": {
+          "name": "Duty/tax/fee category",
+          "format": "an..3",
+          "values": {
+            "E": "ReverseCharge Inland (Wiederverkaeeufer)"
+          }
+        }
+      },
+      "examples": [
+        "TAX+9+VAT+++:::19.0'",
+        "TAX+9+FRE'",
+        "TAX+1+VAT+++:::19.0'",
+        "TAX+1+VAT+++:::0.0'",
+        "TAX+1+VAT+++:::0.0+E'",
+        "TAX+1+FRE'",
+        "TAX+3+VAT+++:::19.0'",
+        "TAX+3+VAT+++:::0.0+E'"
+      ]
+    },
+    "LOC": {
+      "name": "Place/Location Identification",
+      "section": "DETAIL",
+      "description": "Verbindungsziel-Informationen (Zielrufnummer, Zielortsnetz, Land, Mobilnetzbetreiber) bei EVA/EVM. Bei WITA: Endpunkt A (Anfang) und Endpunkt B (Ende) von Leitungen.",
+      "max_occurrences": 10,
+      "elements": {
+        "3227": {
+          "name": "Location function code qualifier",
+          "format": "an..3",
+          "values": {
+            "5": "Quelle / Anfang (Endpunkt A bei WITA, Roaming-Quelle bei EVM)",
+            "8": "Ziel / Ende (Endpunkt B bei WITA, Zielnummer bei EVA/EVM)"
+          }
+        },
+        "C517.3225": {
+          "name": "Location name code (Zielrufnummer)",
+          "format": "an..25",
+          "description": "Inlandsverbindung: Zielortsnetz+Rufnummer. Auslandsverbindung: Zielrufnummer mit Auslandsvorwahl"
+        },
+        "C517.3224": {
+          "name": "Location name (Freitext)",
+          "format": "an..256",
+          "description": "Inlandsverbindung: Zielortsnetzname/-text. Auslandsverbindung: Laendername. Mobilfunk: Laenderkennung+Mobilnetzbetreiber (Roaming). WITA: Adresse kommagetrennt"
+        }
+      },
+      "examples": [
+        "LOC+8+061519079976:::DARMSTADT'",
+        "LOC+8+003912345XXX:::ITALIEN'",
+        "LOC+8+061519079976'",
+        "LOC+5+:::GBRME'",
+        "LOC+8+01721234567:::D2 VODAFONE'",
+        "LOC+5+:::MUSTERSTRASSE,1,56789,MUSTERSTADT'",
+        "LOC+8+:::BEISPIELSTRASSE,5,34567,BEISPIELSTADT'"
+      ]
+    },
+    "PRI": {
+      "name": "Price Details",
+      "section": "DETAIL",
+      "description": "Einzelpreisangabe pro Rechnungsposition oder Verbindung.",
+      "max_occurrences": 6,
+      "elements": {
+        "C509.5125": {
+          "name": "Price qualifier",
+          "value": "CAL",
+          "description": "Berechneter Einzelpreis"
+        },
+        "C509.5118": {
+          "name": "Price",
+          "format": "n..15",
+          "description": "Preis mit moegl. Minuszeichen, vorangestellter Null, 5 Dezimalstellen und Dezimalpunkt"
+        }
+      },
+      "examples": [
+        "PRI+CAL:0.1034'"
+      ]
+    },
+    "UNS": {
+      "name": "Section Control",
+      "section": "SUMMARY",
+      "description": "Trennt Detail- und Summensektion der elektronischen Belege.",
+      "elements": {
+        "0081": {
+          "name": "Section identification",
+          "value": "S",
+          "description": "S trennt Detail und Summary Section"
+        }
+      },
+      "examples": [
+        "UNS+S'"
+      ]
+    },
+    "UNT": {
+      "name": "Message Trailer",
+      "section": "SUMMARY",
+      "description": "Letztes Segment in einer Nachricht.",
+      "examples": [
+        "UNT+<Segmentanzahl>+<Referenz>'"
+      ]
+    },
+    "UNZ": {
+      "name": "Interchange Trailer",
+      "section": "END",
+      "description": "Letztes Segment in einer Uebertragung.",
+      "examples": [
+        "UNZ+<Nachrichtenanzahl>+<Referenz>'"
+      ]
+    },
+    "FTX": {
+      "name": "Free Text",
+      "section": "HEADER und DETAIL",
+      "description": "Freitext-Segmente mit verschiedenen Qualifikatoren.",
+      "qualifiers": {
+        "INV": "Zusatztext fuer gesamte Rechnung",
+        "ACB": "Zusatzinformation (z.B. Rechnungssprache DEU)",
+        "TXD": "Tax declaration (Grund der Umsatzsteuerbefreiung)",
+        "SUR": "Supplier Remarks (Aufsichtsrat und Geschaeftsfuehrung)",
+        "LIN": "Zusatztext zur Rechnungsposition"
+      },
+      "examples": [
+        "FTX+INV+1++ZUSATZTEXT ZUR RECHNUNG:ZEILE 2:ZEILE 3'",
+        "FTX+ACB++++DEU'",
+        "FTX+TXD+++UMSATZSTEUERBEFREIUNG NACH XXX'",
+        "FTX+SUR+++PFLICHTANGABEN?: WWW.TELEKOM.DE/PFLICHTANGABEN'"
+      ]
+    },
+    "ALC": {
+      "name": "Allowance or Charge",
+      "section": "HEADER und DETAIL",
+      "description": "Rabattierungsregeln, BAG-Zugehoerigkeiten (Billing Account Groups), Tarif-Informationen und gebuchte Optionen (ELMO).",
+      "elements": {
+        "5463": {
+          "name": "Allowance or charge qualifier",
+          "values": {
+            "H": "Rabatt fuer die Rechnungsposition",
+            "J": "Tarifmodell (Tarifinformation ELSY/KRSY)"
+          }
+        },
+        "C214.7160_1": {
+          "name": "Special service description (1)",
+          "description": "BAG-Code (z.B. BAG/001), GRP/GruppenIdentifikator, oder Langtext-Optionsname (ELMO)"
+        },
+        "C214.7160_2": {
+          "name": "Special service description (2)",
+          "description": "BAG-Bezeichnung, Gruppenbezeichnung"
+        }
+      },
+      "examples": [
+        "ALC+H++++:::BAG/001'",
+        "ALC+H++++:::BAG/001:GRUPPE 1, TF 1223, TB 152761'",
+        "ALC+H++++:::KOMFORT EVN'",
+        "ALC+H++++:::SMART TRAVELLER'",
+        "ALC+H++++:::BUSINESS BUDGET MOBILE INTERN 50'",
+        "ALC+H++4'",
+        "ALC+J++++:::B.PRICING KONVENT.:44.000'"
+      ]
+    },
+    "PAI": {
+      "name": "Payment Instructions",
+      "section": "HEADER",
+      "description": "Zahlungsart fuer die Rechnung.",
+      "elements": {
+        "C534.4461": {
+          "name": "Payment means code",
+          "values": {
+            "3": "Zahlung per Lastschrift",
+            "20": "Zusendung eines Schecks",
+            "30": "Ueberweisung auf Ihr Konto",
+            "31": "Zahlung per Ueberweisung",
+            "77": "Zahlung per Kreditkarte",
+            "97": "Verrechnung mit der naechsten Rechnung"
+          }
+        }
+      },
+      "examples": [
+        "PAI+::31'"
+      ]
+    },
+    "CUX": {
+      "name": "Currencies",
+      "section": "HEADER",
+      "description": "Waehrungsangaben fuer die Rechnung. Immer EUR.",
+      "examples": [
+        "CUX+1:EUR+6:EUR'",
+        "CUX+1:EUR'"
+      ]
+    }
+  },
+  "contract_matching": {
+    "priority_order": [
+      "sim_number",
+      "phone_number",
+      "account_number",
+      "booking_account"
+    ],
+    "sim_number": {
+      "description": "SIM-Kartennummer (ICCID, 19-stellig) fuer Mobilfunk-Vertraege (ELMO/EVM)",
+      "segment": "IMD",
+      "hierarchy_level": 0,
+      "qualifier_pattern": "IMD+F++06:006:193:<ICCID>:<Profiltext>",
+      "element": "C273.7008_1",
+      "format": "19-stellige ICCID, z.B. 89490200000123456781",
+      "formats": [
+        "ELMO",
+        "EVM"
+      ],
+      "notes": "Der zweite DE7008 enthaelt den Profiltext (TNN, TTC/..., TTB/..., VPN, PVN, SLA, MSC). Bei MSC koennen mehrere ICCID durch / getrennt im zweiten DE7008 stehen."
+    },
+    "phone_number": {
+      "description": "Mobilfunknummer oder Festnetzrufnummer fuer SIP/Festnetz-Vertraege",
+      "segment": "IMD",
+      "hierarchy_level": 1,
+      "qualifier_pattern_mobile": "IMD+F++F88:005:193:<Rufnummer>:<Rufnummerntext>",
+      "qualifier_pattern_landline": "IMD+F++B01:005:193:<Rufnummer>:<Rufnummer_formatiert>",
+      "element": "C273.7008_1",
+      "formats": {
+        "ELMO_EVM": "Format (0171)1234567 - muss mit normalize to E.164 (0-prefix → +49, 00-prefix → +) normalisiert werden",
+        "ELFE_EVA": "Format 251109742172 (Ortsvorwahl+Rufnummer ohne Sonderzeichen)"
+      },
+      "notes": "Rufnummern muessen mit normalize to E.164 (0-prefix → +49, 00-prefix → +) bereinigt werden (0-Prefix zu +49, 00-Prefix zu +)"
+    },
+    "account_number": {
+      "description": "Fernmeldekonto (FKTO) oder Buchungskonto fuer Festnetz-Vertraege",
+      "methods": {
+        "via_IMD": {
+          "segment": "IMD",
+          "hierarchy_level": 0,
+          "qualifier_pattern": "IMD+F++88:006:193:<FKTO>",
+          "element": "C273.7008_1",
+          "formats": [
+            "ELFE",
+            "EVA"
+          ],
+          "note": "88 = FKTO-Qualifier fuer Festnetz"
+        },
+        "via_RFF": {
+          "segment": "RFF",
+          "qualifier": "ADE",
+          "element": "C506.1154",
+          "context": "HEADER (SG1)",
+          "formats": [
+            "ELFE",
+            "EVA",
+            "ELMO",
+            "EVM"
+          ],
+          "note": "ADE = Buchungskonto/Kundenkonto, Primaerreferenz in der Header-Section"
+        }
+      }
+    },
+    "contract_number": {
+      "description": "Vertragsnummer fuer TDN/ELFE/WITA-Vertraege",
+      "methods": {
+        "via_RFF_CT": {
+          "segment": "RFF",
+          "qualifier": "CT",
+          "element": "C506.1154",
+          "context": "DETAIL (SG30, Hierarchiestufe 0/1)",
+          "formats": [
+            "TDN",
+            "ELFE",
+            "WITA"
+          ]
+        },
+        "via_IMD_wita": {
+          "segment": "IMD",
+          "hierarchy_level": 0,
+          "qualifier_pattern": "IMD+F++88:006:193:<FKTO>:<Vertragsnummer>",
+          "element": "C273.7008_2",
+          "formats": [
+            "WITA"
+          ]
+        },
+        "via_IMD_tsbs": {
+          "segment": "IMD",
+          "hierarchy_level": 0,
+          "qualifier_pattern": "IMD+F++88:006:193::<Vertragsnummer>",
+          "element": "C273.7008_2",
+          "formats": [
+            "TSBS",
+            "ELSY_DTAG_Versand"
+          ]
+        }
+      }
+    },
+    "rahmenvertragsnummer": {
+      "description": "Rahmenvertragsnummer fuer ELMO auf Hierarchiestufe 0",
+      "segment": "RFF",
+      "qualifier": "CT",
+      "element": "C506.1154",
+      "context": "DETAIL (SG30, Hierarchiestufe 0)",
+      "formats": [
+        "ELMO"
+      ]
+    }
+  },
+  "parsing_examples": {
+    "mobile_invoice_structure": {
+      "description": "Typische ELMO-Rechnung (Mobilfunk) Segmentreihenfolge",
+      "segments": [
+        "UNA:+.?*'",
+        "UNB+UNOA:4+D--01DTMD1+ELMO123456+20091001:2330+ELMO/0000567'",
+        "UNH+ELMO0000001+INVOIC:D:99B:UN+++ETEB01:3:B00+DT:1:17:212'",
+        "BGM+380+D--01/00037748576854+9'",
+        "DTM+3:20091030:102'",
+        "DTM+167:20091001:102'",
+        "DTM+168:20091028:102'",
+        "NAD+SE+MOB:003:193++TELEKOM DEUTSCHLAND GMBH+LANDGRABENWEG:151+BONN++53227+DE'",
+        "NAD+IV+12345678++MANFRED MUSTERMANN+MUSTERSTRASSE 1+MUSTERSTADT++12345+DE'",
+        "TAX+9+VAT+++:::19.0'",
+        "CUX+1:EUR'",
+        "LIN+1+++:6+0' (Hierarchiestufe 0: Teilnehmerverhältnis)",
+        "IMD+F++06:006:193:89490200000123456781:TNN'",
+        "LIN+2+++:6+1' (Hierarchiestufe 1: Rufnummer)",
+        "IMD+F++F88:005:193:(0171)1234567:TELEFONIE'",
+        "...",
+        "UNS+S'",
+        "MOA+9:109.72'",
+        "MOA+77:109.72'",
+        "MOA+79:94.59'",
+        "MOA+124:15.13'",
+        "UNT+<N>+ELMO0000001'",
+        "UNZ+1+ELMO/0000567'"
+      ]
+    },
+    "landline_invoice_structure": {
+      "description": "Typische ELFE-Rechnung (Festnetz) Segmentreihenfolge",
+      "segments": [
+        "UNA:+.?*'",
+        "UNB+UNOA:4+D--01RFN022+RFN101+20000416:1333+ELFE/0000456'",
+        "UNH+ELFE0000001+INVOIC:D:99B:UN+++ETEB01:3:B00+DT:1:17:212'",
+        "BGM+380+D--01/7030000003+9'",
+        "DTM+3:20091030:102'",
+        "DTM+167:20091001:102'",
+        "DTM+168:20091028:102'",
+        "RFF+ADE:4903213451' (Buchungskonto)",
+        "NAD+SE+DEU01:003:193++TELEKOM DEUTSCHLAND GMBH...'",
+        "NAD+IV+12345678+...' (Rechnungsempfaenger)",
+        "TAX+9+VAT+++:::19.0'",
+        "LIN+1+++:6+0' (Hierarchiestufe 0: FKTO)",
+        "IMD+F++88:006:193:615100079976:615100079976'",
+        "LIN+2+++:6+1' (Hierarchiestufe 1: Rufnummer/Kennung)",
+        "IMD+F++B01:005:193:251109742172'",
+        "...",
+        "UNS+S'",
+        "MOA+9:109.72'",
+        "UNT+<N>+ELFE0000001'",
+        "UNZ+1+ELFE/0000456'"
+      ]
+    }
+  },
+  "debugging_hints": {
+    "provider_identification": [
+      "1. UNB.S002.0004 pruefen: beginnt mit 'D--01' = Telekom",
+      "2. UNB.0020 pruefen: Format-Code vor '/' = ELMO/ELFE/EVA/etc.",
+      "3. UNB.0026 pruefen (falls vorhanden): expliziter Format-Code",
+      "4. NAD+SE: Party-ID = DEU01 (Festnetz) oder MOB (Mobilfunk)"
+    ],
+    "iccid_extraction": [
+      "1. Segment: IMD",
+      "2. Qualifier-Check: 7077='F', C273.7009 beginnt mit '06' UND C273.1131='006' UND C273.3055='193'",
+      "3. Wert: C273.7008(1) = 19-stellige ICCID",
+      "4. Kontext: Nur auf Hierarchiestufe 0 (LIN.1222=0)"
+    ],
+    "phone_number_extraction": [
+      "1. Segment: IMD",
+      "2. Qualifier-Check: 7077='F', C273.7009 endet mit ':005:193'",
+      "3. Wert: C273.7008(1) = Rufnummer (roh)",
+      "4. Normierung: normalize to E.164 (0-prefix → +49, 00-prefix → +) anwenden",
+      "5. ELMO-Format: (0171)1234567 -> after normalization -> +491711234567",
+      "6. ELFE-Format: 251109742172 -> koennte '0251109742172' sein -> after normalization -> +49251109742172"
+    ],
+    "account_number_extraction": [
+      "1. Primaer: RFF+ADE:<Buchungskonto> in Header-Section (SG1)",
+      "2. Sekundaer: IMD+F++88:006:193:<FKTO> in Detail-Section (Hierarchiestufe 0)",
+      "3. ELMO: RFF+ADE:<Kundenkonto> hat 10-stelliges Format mit fuehrenden Nullen"
+    ],
+    "billing_period_extraction": [
+      "1. DTM+167:<CCYYMMDD>:102 = Beginn Abrechnungsperiode",
+      "2. DTM+168:<CCYYMMDD>:102 = Ende Abrechnungsperiode",
+      "3. Beide DTM in HEADER-Section (nicht in Detail-Section)",
+      "4. Format immer CCYYMMDD (102)"
+    ],
+    "invoice_amount_extraction": [
+      "1. Nettobetrag: MOA+79:<Betrag> in Summary-Section",
+      "2. Bruttobetrag: MOA+9:<Betrag> in Summary-Section (Zahlbetrag)",
+      "3. MwSt-Betrag: MOA+124:<Betrag> in Summary-Section",
+      "4. MwSt-Satz: TAX+9+VAT+++:::19.0 in Header-Section",
+      "5. Lastschriftbetrag: MOA+211:<Betrag> in Summary-Section"
+    ],
+    "common_pitfalls": [
+      "IMD-Segment hat komplexe Qualifier-Kombination: alle drei Felder 7009, 1131, 3055 zusammen pruefen",
+      "ICCID hat immer 19 Stellen (Ziffern), beginnt meist mit 89490 (Telekom Deutschland)",
+      "ELMO-Rufnummern kommen im Format (0171)1234567 - Klammern entfernen during phone normalization",
+      "Ein Fernmeldekonto (FKTO) ist KEIN Vertragsmerkmal, sondern ein Abrechnungskonto; ein FKTO kann mehrere Rufnummern enthalten",
+      "Bei MultiSIM (MSC) enthaelt C273.7008_2 mehrere ICCID getrennt durch '/'",
+      "Bei ELSY beginnen laufende Nummern in UNB mit 10000",
+      "Teilsummen in Summary koennen 0 sein (ELMO und EVA geben auch 0-Betraege aus)",
+      "Qualifier-Code in IMD.C273.7009 kann variierende Prefix-Zeichen haben (z.B. F88, B01, Z88, C88) - wichtig ist das Suffix ':005:193' oder ':006:193'"
+    ]
+  }
+}

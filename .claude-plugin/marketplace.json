@@ -1,0 +1,17 @@
+{
+  "name": "weslink-claude-marketplace",
+  "description": "Weslink internal Claude Code plugin marketplace",
+  "owner": {
+    "name": "Weslink GmbH"
+  },
+  "plugins": [
+    {
+      "name": "edifact",
+      "description": "EDIFACT INVOIC segment definitions and parsing context for German telecom providers (Telekom, Vodafone, O2)",
+      "source": "./plugins/edifact",
+      "version": "1.0.0",
+      "category": "domain-knowledge",
+      "tags": ["edifact", "telekom", "vodafone", "o2", "invoic"]
+    }
+  ]
+}

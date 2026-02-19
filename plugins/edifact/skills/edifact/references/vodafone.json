@@ -1,0 +1,940 @@
+{
+  "provider": "Vodafone",
+  "formats": [
+    "ELMI11",
+    "ELMI12"
+  ],
+  "message_type": "INVOIC",
+  "release": "UN D.01B",
+  "document_version": "1.04",
+  "issued": "2018-06-01",
+  "unb_sender": "MDVEDI",
+  "notes": {
+    "identification": "Vodafone-Dateien können NICHT sicher per Dateiname identifiziert werden. Provider-Erkennung ausschließlich über UNB-Segment (Absender = MDVEDI) oder NAD+SU (Vodafone GmbH).",
+    "formats": {
+      "ELMI11": "Standard-Mobilfunk",
+      "ELMI12": "M2M/IoT (Machine-to-Machine / Internet of Things) - erkennt man am BGM-Feld mit Wert M2M"
+    },
+    "m2m_special": "Bei M2M-Rechnungen steht im MSISDN-Feld (RFF+CN) nur '00000000'. Zur Teilnehmer-Identifikation wird die IMSI in der Verbindungsübersicht verwendet.",
+    "document_types": {
+      "380": "Rechnung (Invoice) - BGM+380",
+      "190": "Information zur Vodafone-Nummer (einzelner Teilnehmer) - BGM+190"
+    },
+    "file_naming": "<Rechnungskontonummer>_<Rechnungsnummer>_<EnddatumRechnungszyklus>_<Dateinummer>_<GesamtAnzahl>.<Erweiterung>",
+    "file_extensions": {
+      "rueb": "Rechnung oder Information zur Vodafone-Nummer",
+      "evn": "Verbindungs-Übersicht (Einzelentgeltnachweis)"
+    }
+  },
+  "segments": {
+    "UNA": {
+      "name": "Trennzeichen-Vorgabe",
+      "description": "Definiert die Trennzeichen innerhalb der EDIFACT-Nachricht.",
+      "status": "C (optional)",
+      "example": "UNA:+.? '",
+      "fixed_values": {
+        "component_separator": ":",
+        "data_element_separator": "+",
+        "decimal_notation": ".",
+        "release_character": "?",
+        "segment_terminator": "'"
+      }
+    },
+    "UNB": {
+      "name": "Nutzdaten-Kopfsegment (Interchange Header)",
+      "description": "Identifiziert den Absender (Vodafone) und Empfänger der Übertragungsdatei. Absender ist immer 'MDVEDI'.",
+      "status": "M (Pflicht)",
+      "detection_pattern": "UNB+UNOC:1+MDVEDI+",
+      "example": "UNB+UNOC:1+MDVEDI+Receiver+201506:0828+4711'",
+      "elements": {
+        "S001.0001": {
+          "name": "Syntax-Kennung",
+          "value": "UNOC",
+          "description": "UN/ECE level C (ISO 8859-1) - Definition des Zeichensatzes"
+        },
+        "S001.0002": {
+          "name": "Syntax-Versionsnummer",
+          "value": "1",
+          "description": "Versionsnummer 1"
+        },
+        "S002.0004": {
+          "name": "Absenderbezeichnung",
+          "value": "MDVEDI",
+          "description": "Vodafone-Absenderbezeichnung für 'Elektronische Rechnungsinformationen Mobilfunk'. WICHTIG: Dies ist der primäre Identifikator für Vodafone-Dateien."
+        },
+        "S003.0010": {
+          "name": "Empfängerbezeichnung",
+          "description": "Logische Empfängerbezeichnung - kann durch den Partner frei gewählt werden."
+        },
+        "S004.0017": {
+          "name": "Datum der Erstellung",
+          "format": "YYMMDD",
+          "description": "Erstelldatum der Übertragungsdatei"
+        },
+        "S004.0019": {
+          "name": "Uhrzeit der Erstellung",
+          "format": "HHMM",
+          "description": "Erstellzeit der Übertragungsdatei"
+        },
+        "0020": {
+          "name": "Datenaustauschreferenz",
+          "description": "Wird beginnend bei 1 für jede Übertragung um 1 inkrementiert."
+        }
+      }
+    },
+    "UNH": {
+      "name": "Nachrichten-Kopfsegment",
+      "description": "Kennzeichnet den Beginn einer elektronischen Vodafone Mobilfunk Rechnungsinformationen Nachricht.",
+      "status": "M (Pflicht)",
+      "example_elmi11": "UNH+ELMOD200001+INVOIC:D:01B:UN:ELMI11++1:C'",
+      "example_elmi12": "UNH+ELMOD200001+INVOIC:D:01B:UN:ELMI12++1:C'",
+      "elements": {
+        "0062": {
+          "name": "Nachrichten-Referenznummer",
+          "format": "ELMOD2 + nnnnn",
+          "description": "Format: 'ELMOD2' + laufende Nummer (5-stellig). Ausgangswert: 'ELMOD200001'. Wird für jede weitere Nachricht innerhalb der Sendung um 1 erhöht."
+        },
+        "S009.0065": {
+          "name": "Nachrichtentyp-Kennung",
+          "value": "INVOIC",
+          "description": "EDIFACT Standard Invoice Subset"
+        },
+        "S009.0052": {
+          "name": "Versionsnummer",
+          "value": "D"
+        },
+        "S009.0054": {
+          "name": "Freigabenummer",
+          "value": "01B"
+        },
+        "S009.0051": {
+          "name": "Verwaltende Organisation",
+          "value": "UN"
+        },
+        "S009.0057": {
+          "name": "Anwendungscode",
+          "values": {
+            "ELMI11": "Standard-Mobilfunk (Electronic Mobile Invoice Version 1.1)",
+            "ELMI12": "M2M/IoT (Electronic Mobile Invoice Version 1.2 - nur für M2M)"
+          }
+        },
+        "S010.0070": {
+          "name": "Übermittlungsfolgenummer",
+          "description": "Pro Datei erhöht, beginnt bei 1."
+        },
+        "S010.0073": {
+          "name": "Erste und letzte Übermittlung",
+          "values": {
+            "C": "Erste Nachricht einer Teilsendung",
+            "F": "Letzte Nachricht einer Teilsendung (oder einzige Nachricht)"
+          }
+        }
+      }
+    },
+    "BGM": {
+      "name": "Beginn der Nachricht",
+      "description": "Qualifiziert den Nachrichtentyp (Rechnung oder Information zur Vodafone-Nummer) und überträgt die Dokumentennummer. Enthält auch M2M-Kennzeichnung.",
+      "status": "M (Pflicht)",
+      "examples": {
+        "invoice": "BGM+380+101103370'",
+        "participant_info": "BGM+190+0172/8900545'",
+        "m2m_invoice": "BGM+380+101103370++M2M'"
+      },
+      "elements": {
+        "C002.1001": {
+          "name": "Dokumentenname, Code",
+          "values": {
+            "380": "Rechnung",
+            "190": "Information zur Vodafone-Nummer (teilnehmerspezifische Kosteninformation, keine Zahlungsaufforderung)"
+          }
+        },
+        "1004": {
+          "name": "Dokumentennummer",
+          "description": "Für BGM+380 (Rechnung): 9-stellige Kundennummer mit führenden Nullen (nnnnnnnnn). Für BGM+190 (Info zur Vodafone-Nr.): 5-stelliger NDC + 7-stellige MSISDN (NDC/MSISDN = nnnnn/nnnnnnn)."
+        },
+        "4343": {
+          "name": "Nachrichtenfunktion, Code",
+          "value": "M2M",
+          "description": "Wenn gesetzt: M2M-Rechnung. Keine Rufnummer-Informationen. Auswertung über IMSI im Einzelverbindungsnachweis."
+        }
+      }
+    },
+    "DTM": {
+      "name": "Datum/Uhrzeit/Zeitspanne",
+      "description": "Überträgt Rechnungsdatum, Abrechnungsperiode und Vertragsdaten. Format für Datumsangaben: CCYYMMDD (Qualifier 102).",
+      "status": "M (Pflicht, bis zu 3 Wiederholungen im Kopf)",
+      "examples": {
+        "invoice_date": "DTM+3:20141113:102'",
+        "billing_start": "DTM+51:20141010:102'",
+        "billing_end": "DTM+52:20141109:102'",
+        "contract_start": "DTM+92:20150202:102'",
+        "contract_min_end": "DTM+93:20180201:102'",
+        "last_cancellation": "DTM+559:20171201:102'",
+        "cancellation_period": "DTM+667:03:802'",
+        "payment_due": "DTM+13:20150122:102'",
+        "bonus_period_end": "DTM+91:20141107:102'"
+      },
+      "qualifiers": {
+        "3": {
+          "description": "Rechnungsdatum",
+          "format": "102 = CCYYMMDD"
+        },
+        "13": {
+          "description": "Zahlungstermin (Fälligkeitstermin)",
+          "format": "102 = CCYYMMDD"
+        },
+        "51": {
+          "description": "Beginn der Abrechnungsperiode",
+          "format": "102 = CCYYMMDD",
+          "relevance": "HOCH - Abrechnungszeitraum Beginn"
+        },
+        "52": {
+          "description": "Ende der Abrechnungsperiode",
+          "format": "102 = CCYYMMDD",
+          "relevance": "HOCH - Abrechnungszeitraum Ende"
+        },
+        "91": {
+          "description": "Ende des Berichtszeitraums für Bonusprogramm / Transferdatum Miles&More",
+          "format": "102 = CCYYMMDD"
+        },
+        "92": {
+          "description": "Vertragsbeginn",
+          "format": "102 = CCYYMMDD"
+        },
+        "93": {
+          "description": "Ende der Mindestvertragslaufzeit",
+          "format": "102 = CCYYMMDD"
+        },
+        "559": {
+          "description": "Letztmögliches Kündigungsdatum",
+          "format": "102 = CCYYMMDD"
+        },
+        "667": {
+          "description": "Kündigungsfrist",
+          "format": "802 = Monate"
+        }
+      }
+    },
+    "FTX": {
+      "name": "Freier Text",
+      "description": "Überträgt Zusatztexte zur Rechnung: Informationen zu Drittanbieterleistungen, allgemeine Hinweise, Bankverbindung, Fußnoten.",
+      "status": "C (optional, bis zu 99 Wiederholungen)",
+      "examples": {
+        "general_info": "FTX+AAI+++Begründete Einwendungen...'",
+        "bank_info": "FTX+AFU+++Vodafone_BankName:Vodafone_BIC:Vodafone_IBAN'",
+        "vat_exemption_reason": "FTX+AGM+++Grund_des_MwSt-Freibetrags'",
+        "footnote": "FTX+FN+++Fußnote'",
+        "third_party": "FTX+INV+++Hinsichtlich der in der Rechnung ausgewiesenen Leistungen Dritter...'"
+      },
+      "qualifiers": {
+        "INV": {
+          "description": "Informationen zu Leistungen von Drittanbietern + zusätzliche Hinweise/Mitteilungen zur Rechnung"
+        },
+        "AAI": {
+          "description": "Allgemeine Informationen zur Rechnung (Widerspruchshinweis, allg. Vodafone-Mitteilungen)"
+        },
+        "AAB": {
+          "description": "Informationen zur Preisgestaltung (z.B. Entgeltminderungen)"
+        },
+        "AFU": {
+          "description": "Informationen zum Vodafone Kreditinstitut (Bankverbindung). Format: BankName:BIC:IBAN"
+        },
+        "AGM": {
+          "description": "Informationen zum Grund des MwSt-Freibetrags"
+        },
+        "FN": {
+          "description": "Fußnoten (nur bei M2M/ELMI12)"
+        }
+      }
+    },
+    "RFF": {
+      "name": "Referenzangaben",
+      "description": "Enthält verschiedene Referenznummern wie Kundennummer, Rechnungsnummer, MSISDN, Rahmenvertragsnummer etc. Wichtigste Quelle für Contract-Matching.",
+      "status": "C (mehrfach in SG1 und SG3)",
+      "examples": {
+        "customer_number": "RFF+IT:101690580'",
+        "invoice_number": "RFF+IV:119999999999'",
+        "msisdn": "RFF+CN:0172/8900545'",
+        "m2m_msisdn": "RFF+CN:00000000'",
+        "framework_contract": "RFF+ADF:1122334455'",
+        "vat_supplier": "RFF+VA:DE813113094'",
+        "company_location": "RFF+ALV:Sitz der Gesellschaft?: Düsseldorf'",
+        "court": "RFF+AHO:Amtsgericht Düsseldorf, HRB 38062'",
+        "weee": "RFF+XA:DE 91435957'",
+        "tax_number": "RFF+AHP:103/5700/1789'",
+        "mandate_ref": "RFF+AHM:DE04KMMC000999999999T999999999'"
+      },
+      "qualifiers": {
+        "IT": {
+          "description": "Kundennummer (9-stellig mit führenden Nullen)",
+          "format": "an..9",
+          "relevance": "HOCH - Primäre Kundennummer"
+        },
+        "IV": {
+          "description": "Rechnungsnummer",
+          "format": "an..12",
+          "relevance": "MITTEL"
+        },
+        "VA": {
+          "description": "Umsatzsteuernummer des Rechnungsempfängers oder USt-ID des Lieferanten",
+          "format": "an..16"
+        },
+        "RB": {
+          "description": "Tariftyp - Kennzeichnet das für den Teilnehmer verwendete Abrechnungsmodell",
+          "format": "an..5",
+          "example": "REE"
+        },
+        "CN": {
+          "description": "MSISDN (Vodafone-Rufnummer), DSL- oder Festnetzanschlussnummer. Bei M2M: '00000000'.",
+          "format": "NDC/MSISDN = nnnnn/nnnnnnn (z.B. 0172/8900545)",
+          "relevance": "HOCH - Primäre Rufnummer für Contract-Matching"
+        },
+        "CR": {
+          "description": "Interne Kennziffer (Identification for customer) - kann vom Kunden frei bestimmt werden",
+          "format": "an..15"
+        },
+        "PT": {
+          "description": "Product type",
+          "format": "an..3",
+          "examples": [
+            "GSM",
+            "ANL"
+          ]
+        },
+        "ADF": {
+          "description": "Rahmenvertragsnummer",
+          "relevance": "HOCH - Rahmenvertragsnummer für Contract-Matching"
+        },
+        "ALV": {
+          "description": "Sitz der Gesellschaft des Lieferanten"
+        },
+        "AHO": {
+          "description": "Gerichtsstand, Handelsregistereintrag des Lieferanten"
+        },
+        "XA": {
+          "description": "WEEE-Reg.Nr."
+        },
+        "AHP": {
+          "description": "Umsatz-Steuernummer des Lieferanten (Rechnungsversender)"
+        },
+        "ACF": {
+          "description": "Referenz des Adressaten (kann vom Kunden frei bestimmt werden)",
+          "format": "an..30"
+        },
+        "AHM": {
+          "description": "Mandatsreferenznummer des Adressaten (nur für Lastschriftkunden)"
+        }
+      }
+    },
+    "NAD": {
+      "name": "Name und Anschrift",
+      "description": "Enthält Namens- und Adressangaben der verschiedenen Beteiligten. NAD+SU enthält 'Vodafone GmbH'.",
+      "status": "M in SG2 (mehrfach mit verschiedenen Qualifiern)",
+      "qualifiers": {
+        "IV": {
+          "description": "Rechnungsempfänger (Invoice Recipient) - Adresse des Kunden der die Rechnung erhält",
+          "example": "NAD+IV+++ABC GmbH+Hauptstrasse 1+Heiden++50999+DE'",
+          "elements": {
+            "3124": "Name und Anschrift (Zeile 1-5): Namens- und/oder Adressangaben",
+            "3036": "Name des Beteiligten (Name 1 bis Name 4)",
+            "C059.3042": "Straße und Hausnummer oder Postfach",
+            "3164": "Ort",
+            "3251": "Postleitzahl",
+            "3207": "Ländername, Code (z.B. 'DE')"
+          },
+          "notes": "Falls Ortsangabe > 35 Zeichen: SG2 wird wiederholt (NAD+FII Kombination). Pflichtfeld im Vodafone EDIFACT."
+        },
+        "SU": {
+          "description": "Lieferant (Supplier) - Adresse von Vodafone als Rechnungssteller",
+          "example": "NAD+SU+++Vodafone GmbH+Postfach?: 40542 Düsseldorf:Ferdinand-Braun-Platz 1+Düsseldorf++40549+DE'",
+          "elements": {
+            "C058.3124": "Name und Anschrift: Postfach, Postleitzahl und Ort der VF-Niederlassung",
+            "C080.3036": "Name des Beteiligten: 'Vodafone GmbH'",
+            "C059.3042": "Straße der postalischen Anschrift",
+            "3164": "Ort: 'Düsseldorf'",
+            "3251": "Postleitzahl: '40549'",
+            "3207": "Land: 'DE'"
+          },
+          "relevance": "HOCH - Sekundärer Provider-Identifikator ('Vodafone GmbH')"
+        },
+        "II": {
+          "description": "Rechnungsversender (Invoice Issuer) - Vodafone Niederlassung die die Rechnung versendet",
+          "example": "NAD+II+++Vodafone GmbH:Vodafone Kundenbetreuung+40875 Ratingen++++DE'",
+          "elements": {
+            "C058.3124": "Postfach/PLZ/Ort der VF-Niederlassung",
+            "C080.3036": "Name der Niederlassung (z.B. 'Vodafone GmbH:Vodafone Kundenbetreuung')",
+            "3164": "Ort",
+            "3207": "Land"
+          }
+        },
+        "BY": {
+          "description": "Käufer/Vertragspartner (Buyer) - Erscheint nur, wenn Name/Adresse vom Rechnungsempfänger abweicht",
+          "example": "NAD+BY+++KäuferName+Postfach?: Käufer:Street 99+CITY++40000+DE'",
+          "elements": {
+            "C058.3124": "Name und Anschrift: Postfach, Postleitzahl und Ort des Käufers",
+            "C080.3036": "Name des Käufers (Name 1 bis Name 4)",
+            "C059.3042": "Straße der postalischen Anschrift",
+            "3164": "Ort",
+            "3251": "Postleitzahl",
+            "3207": "Land: 'DE'"
+          }
+        }
+      }
+    },
+    "LIN": {
+      "name": "Positionsdaten",
+      "description": "Leitet eine neue Rechnungsposition ein. Die Positionsnummer wird für jede neue Position um 1 inkrementiert. Jede LIN-Gruppe enthält IMD, QTY, MOA, TAX.",
+      "status": "M in SG26 (Pflicht für jede Rechnungsposition)",
+      "example": "LIN+1'",
+      "elements": {
+        "1082": {
+          "name": "Positionsnummer",
+          "format": "n (ganzzahlig, aufsteigend ab 1)",
+          "description": "Pflichtfeld, numerisch"
+        }
+      },
+      "structure": "Jede LIN-Gruppe enthält: LIN > IMD (Produktgruppe) > IMD (Service) > QTY (optional) > MOA (Nettobetrag) > TAX (Umsatzsteuer)"
+    },
+    "IMD": {
+      "name": "Produkt-/Leistungsbeschreibung",
+      "description": "Enthält Service-Schlüssel und -beschreibungen, Produktgruppen und Bonusprogramm-Informationen. Immer zwei IMD-Segmente pro LIN: erstes für Produktgruppe, zweites für Service.",
+      "status": "C in SG26 (bis zu 3 Wiederholungen pro Position)",
+      "examples": {
+        "product_group": "IMD+B++140:161:91'",
+        "service": "IMD+B++NR100:128:91:Vodafone Red XS inkl. Smartphone'",
+        "gprs_data": "IMD+B++NGPVOTOT:128:91:Datenverbindungen insgesamt in KB'",
+        "discount": "IMD+B++NR100 D:128:91:15 % Studenten-Rabatt'"
+      },
+      "structure": {
+        "7077": {
+          "name": "Beschreibungsformat, Code",
+          "value": "B",
+          "description": "Immer 'B' = Code und Text"
+        },
+        "C273.7009": {
+          "name": "Produkt-/Leistungsbeschreibung, Code",
+          "description": "Enthält je nach Qualifier-Kombination: Produktgruppen-Code (3-stellig), Service-Code (8-stellig) oder Bonusprogramm-Code (2-stellig)"
+        },
+        "C272.7081": {
+          "name": "Codeliste-Code / Qualifier",
+          "values": {
+            "128": "Service - Kennzeichnung einer Position (8-stelliger Service-Code)",
+            "161": "Produkt - Kennzeichnung einer Gruppe (3-stelliger Produktgruppen-Code)",
+            "135": "Bonusprogramm (2-stellig)",
+            "102": "Bonusstatus (2-stellig)"
+          }
+        },
+        "C272.1131": {
+          "name": "Verantwortliche Stelle",
+          "value": "91",
+          "description": "Immer '91' = vergeben durch den Verkäufer"
+        },
+        "C273.7008": {
+          "name": "Servicebeschreibung",
+          "parts": [
+            "Teil 1 (bis 256 Zeichen)",
+            "Teil 2 (bis 256 Zeichen)"
+          ],
+          "description": "Lesbarer Beschreibungstext des Service oder der Produktgruppe"
+        }
+      },
+      "product_groups": {
+        "127": "Grundgebühren / Basisdienste",
+        "131": "GPRS/Datenverbindungen - Schlüssel: 'NGPVOTOT'",
+        "140": "Tarife / Grundgebühren (Haupttarif)",
+        "150": "Mobile Datendienste / Internet",
+        "170": "Sonstige Leistungen (z.B. Gebühren, Überweisungsgebühr)",
+        "180": "Rabatte (erkennbar am 'D' am Ende des Service-Codes)",
+        "192": "Mobiles Bezahlen Transaktionen (Einzug von Forderungen Dritter)",
+        "193": "CallNow-Transfer (Transfer von Guthaben)",
+        "195": "Vodafone Stars / Miles&More Bonusprogramm"
+      },
+      "service_code_structure": {
+        "first_char": {
+          "J": "Kundenbezogene Position - nur auf der Rechnung (BGM+380)",
+          "N": "Teilnehmerbezogene Position - erscheint auch auf 'Information zur Vodafone-Nummer'",
+          "I": "Reine Information - fließt nicht in Rechnungsbetrag/Umsatzsteuer ein"
+        },
+        "chars_2_to_7": "Eigentlicher Service-Schlüssel",
+        "last_char_D": "Kennzeichnet Rabatte zu einem Service"
+      }
+    },
+    "QTY": {
+      "name": "Menge",
+      "description": "Mengenangaben zu einer Rechnungsposition (z.B. Anzahl, GPRS-Volumen in KB, Bonuspunkte).",
+      "status": "C in SG26",
+      "example": "QTY+141:53:2P'",
+      "qualifiers": {
+        "141": {
+          "description": "Ermittelte Menge der Abrechnungsperiode",
+          "units": {
+            "2P": "Kilobyte (nur für GPRS-Datenvolumen, Produktgruppe 131)",
+            "PCE": "Stück (für Bonuspunkte Vodafone-Stars oder Meilen Miles&More, Produktgruppe 195)",
+            "(leer)": "Stück/Anzahl für normale Leistungen"
+          }
+        },
+        "74": {
+          "description": "Letzte kumulierte Menge der Bonuspunkte (aktueller Punktestand Vodafone-Stars oder übertragende Meilen Miles&More)"
+        },
+        "107": {
+          "description": "Tarifeinheiten"
+        }
+      }
+    },
+    "MOA": {
+      "name": "Geldbetrag",
+      "description": "Enthält Geldbeträge auf Positions- und Zusammenfassungsebene. Positionsbeträge in SG27, Gesamtbeträge in SG50/SG52.",
+      "status": "M in SG27 und SG50",
+      "examples": {
+        "position_net": "MOA+66:5.9'",
+        "total_net": "MOA+340:5.94'",
+        "total_gross_with_payment": "MOA+9:275.91'",
+        "vat_amount": "MOA+124:12.93'",
+        "vat_taxable": "MOA+125:68.05'",
+        "vat_taxable_4dec": "MOA+125:68.0529:::9'",
+        "outstanding_balance": "MOA+263:194.93'"
+      },
+      "qualifiers": {
+        "position_level": {
+          "66": {
+            "description": "Positionsbetrag (Netto) - Nettopositionsbetrag der einzelnen Rechnungsposition",
+            "precision": "bis zu 4 Nachkommastellen",
+            "relevance": "HOCH - Einzelkosten pro Leistung"
+          },
+          "203": {
+            "description": "Positionsbetrag Mobiles Bezahlen Transaktionen (Brutto)",
+            "precision": "bis zu 2 Nachkommastellen"
+          },
+          "204": {
+            "description": "Positionsbetrag CallNow-Transfer (Brutto)",
+            "precision": "bis zu 2 Nachkommastellen"
+          }
+        },
+        "summary_level": {
+          "9": {
+            "description": "Zu zahlender Betrag (Kontoauszug-Info, stichtagsabhängig) = Gesamtbruttobetrag inkl. Mobiles Bezahlen + CallNow-Transfer",
+            "relevance": "HOCH - Gesamtrechnungsbetrag"
+          },
+          "77": {
+            "description": "Gesamtbruttobetrag inklusive der Positionen für Mobiles Bezahlen Transaktionen und CallNow-Transfer (nur Rechnung BGM+380)"
+          },
+          "124": {
+            "description": "Umsatzsteuerbetrag der Rechnung (nicht für Information zur Vodafone-Nummer)",
+            "precision": "bis zu 2 Nachkommastellen"
+          },
+          "125": {
+            "description": "Umsatzsteuerpflichtiger Betrag. In TAX+7-Gruppe: 2 Nachkommastellen. In TAX+9-Gruppe: 4 Nachkommastellen als Zusatzinfo.",
+            "note": "Gleicher Qualifier für 2 und 4 Nachkommastellen - Unterscheidung über TAX-Qualifier (7 vs. 9)"
+          },
+          "263": {
+            "description": "Offener Betrag/Guthaben aus Vormonaten (Kontoauszug-Info, stichtagsabhängig)"
+          },
+          "304": {
+            "description": "Gesamtbruttobetrag exklusive der Positionen für Mobiles Bezahlen und CallNow-Transfer (nur Rechnung BGM+380)"
+          },
+          "340": {
+            "description": "Gesamtnettobetrag exklusive der Positionen für Mobiles Bezahlen und CallNow-Transfer",
+            "precision": "bis zu 4 Nachkommastellen (Info zur Vodafone-Nummer), bis zu 2 Nachkommastellen (Rechnungsebene)",
+            "relevance": "HOCH - Netto-Gesamtbetrag"
+          }
+        }
+      }
+    },
+    "TAX": {
+      "name": "Zoll-/Steuer-/Gebührenangaben",
+      "description": "Enthält Umsatzsteuerinformationen auf Positions- und Zusammenfassungsebene.",
+      "status": "C in SG34 (Position), M in SG52 (Zusammenfassung)",
+      "examples": {
+        "position_vat": "TAX+1+VAT+++:::19'",
+        "summary_vat_7": "TAX+7+VAT+++:::19'",
+        "summary_vat_9_precision": "TAX+9+VAT+++:::19'"
+      },
+      "elements": {
+        "5283": {
+          "name": "Zoll-/Steuer-/Gebührenfunktion, Qualifier",
+          "values": {
+            "1": "Steuerinformation zur Rechnungsposition",
+            "7": "Steuer (Zusammenfassungsebene - normaler Steuersatz mit 2 Nachkommastellen-Genauigkeit)",
+            "9": "Steuerbezogene Zusatzinformation (Zusammenfassungsebene - umsatzsteuerpflichtiger Betrag mit 4 Nachkommastellen-Genauigkeit)"
+          }
+        },
+        "C241.5153": {
+          "name": "Zoll-/Steuer-/Gebühren-Art, Code",
+          "value": "VAT",
+          "description": "Umsatzsteuer"
+        },
+        "C243.5278": {
+          "name": "Zoll-/Steuer-/Gebührenrate",
+          "description": "Umsatzsteuersatz in vollen Hunderten (z.B. '19' für 19%)"
+        }
+      }
+    },
+    "PRI": {
+      "name": "Preisangaben",
+      "description": "Enthält positionsbezogene Preisinformationen (Einzelpreis). Wird nur erzeugt, wenn ein Einzelpreis angegeben werden kann. Nullwerte werden nicht übertragen.",
+      "status": "C in SG29",
+      "example": "PRI+CAL:1.12'",
+      "qualifiers": {
+        "CAL": {
+          "description": "Einzelpreis (Netto), Format: n Vorkommastellen, Dezimalpunkt, n Nachkommastellen"
+        }
+      }
+    },
+    "CUX": {
+      "name": "Währungsangaben",
+      "description": "Gibt die für das Dokument zugrunde gelegte Hauptwährung an (immer EUR).",
+      "status": "M in SG7",
+      "example": "CUX+1:EUR'",
+      "qualifiers": {
+        "1": {
+          "description": "Währung des zu zahlenden Betrages",
+          "value": "EUR",
+          "description_full": "Euro - Hauptwährung für alle Beträge. Abweichende Währungen werden gesondert ausgewiesen."
+        }
+      }
+    },
+    "PAT": {
+      "name": "Zahlungsbedingungen",
+      "description": "Überträgt Zahlungsbedingungen (Fälligkeitszeitraum).",
+      "status": "C in SG8",
+      "example": "PAT+5++5:1:CD:9'",
+      "elements": {
+        "4279": {
+          "name": "Zahlungsbedingung, Qualifier",
+          "value": "5",
+          "description": "Kein Skonto"
+        },
+        "2475": {
+          "name": "Ereignis, Bezugstermin",
+          "value": "5",
+          "description": "Rechnungsdatum"
+        },
+        "2009": {
+          "name": "Zeitbezug",
+          "value": "1",
+          "description": "Bezugsdatum"
+        },
+        "2151": {
+          "name": "Art der Zeitspanne",
+          "value": "CD",
+          "description": "Kalendertage (einschließlich Wochenende und Feiertage)"
+        },
+        "2152": {
+          "name": "Zeitspanne, Menge",
+          "description": "Anzahl der Kalendertage bis zum Zahlungstermin. Fälligkeitsdatum = Bill-Date + 8 Arbeitstage (Lastschrift) bzw. + 11 Arbeitstage (Überweisung)."
+        }
+      }
+    },
+    "FII": {
+      "name": "Kreditinstitut",
+      "description": "Enthält IBAN und BIC für Zahlungsabwicklung. Bei Lastschrift: IBAN/BIC des Kunden. Bei Überweisung: IBAN/BIC von Vodafone.",
+      "status": "C in SG2",
+      "examples": {
+        "customer_debit": "FII+BI+DE8510010010099999999+PBNKDEFFXXX'",
+        "vodafone_transfer": "FII+RH+DE68300700100999999999+DEUTDEDDXXX'"
+      },
+      "qualifiers": {
+        "BI": {
+          "description": "Zahlender (Kunde bei Lastschrift) - IBAN/BIC des Kunden"
+        },
+        "RH": {
+          "description": "Zahlungsempfänger (Vodafone bei Überweisung) - IBAN/BIC von Vodafone"
+        }
+      }
+    },
+    "PAI": {
+      "name": "Zahlungsangaben",
+      "description": "Kennzeichnet das zwischen Kunde und Vodafone vereinbarte Zahlungsverfahren.",
+      "status": "C in SG0",
+      "example": "PAI+1::30'",
+      "qualifiers": {
+        "1": "Direkte Zahlung",
+        "30": "Zahlung per Überweisung",
+        "31": "Zahlung per Lastschrift"
+      }
+    },
+    "UNS": {
+      "name": "Abschnitts-Kontrollsegment",
+      "description": "Trennt den Positionsteil (SG26) und den Summenteil (SG50) einer Nachricht.",
+      "status": "M (Pflicht)",
+      "example": "UNS+S'",
+      "value": "S = Ende des Positionsteils"
+    },
+    "UNT": {
+      "name": "Nachrichten-Endesegment",
+      "description": "Kennzeichnet das Ende einer Vodafone Mobilfunk Rechnungsinformation-Nachricht.",
+      "status": "M (Pflicht)",
+      "example": "UNT+179+X'",
+      "elements": {
+        "0074": "Anzahl der Segmente in der Nachricht",
+        "0062": "Nachrichten-Referenznummer (analog UNH/0062)"
+      }
+    },
+    "UNZ": {
+      "name": "Nutzdaten-Endesegment",
+      "description": "Kennzeichnet das Ende einer Vodafone Mobilfunk Rechnungsinformation-Datei.",
+      "status": "M (Pflicht)",
+      "example": "UNZ+1+4711'",
+      "elements": {
+        "0036": "Datenaustauschzähler (Anzahl der Nachrichten der Übertragung)",
+        "0020": "Datenaustauschreferenz (analog UNB/0020)"
+      }
+    }
+  },
+  "segment_groups": {
+    "SG1": {
+      "description": "Referenzinformationen (Kundennummer, Rechnungsnummer, MSISDN, Rahmenvertrag)",
+      "segments": [
+        "RFF",
+        "DTM"
+      ],
+      "max_repetitions": 99999
+    },
+    "SG2": {
+      "description": "Name und Anschrift der Beteiligten (mit Qualifiern IV, SU, II, BY)",
+      "segments": [
+        "NAD",
+        "LOC",
+        "FII",
+        "MOA",
+        "SG3",
+        "SG4",
+        "SG5"
+      ],
+      "max_repetitions": 99
+    },
+    "SG3": {
+      "description": "Referenzinformationen des Lieferanten (USt-ID, Gerichtsstand etc.)",
+      "segments": [
+        "RFF",
+        "DTM"
+      ],
+      "max_repetitions": 9999
+    },
+    "SG5": {
+      "description": "Kontaktinformationen (Telefon, Fax, E-Mail von Vodafone)",
+      "segments": [
+        "CTA",
+        "COM"
+      ],
+      "max_repetitions": 5
+    },
+    "SG7": {
+      "description": "Währungsangaben",
+      "segments": [
+        "CUX"
+      ],
+      "max_repetitions": 99
+    },
+    "SG8": {
+      "description": "Zahlungsbedingungen und Fälligkeitsdatum",
+      "segments": [
+        "PAT",
+        "DTM"
+      ],
+      "max_repetitions": 10
+    },
+    "SG26": {
+      "description": "Rechnungspositionen (Hauptstruktur der Einzelpositionen)",
+      "segments": [
+        "LIN",
+        "IMD",
+        "QTY",
+        "DTM",
+        "SG27",
+        "SG29",
+        "SG34"
+      ],
+      "max_repetitions": 9999999
+    },
+    "SG27": {
+      "description": "Positionsbeträge",
+      "segments": [
+        "MOA"
+      ],
+      "max_repetitions": 99
+    },
+    "SG29": {
+      "description": "Preisangaben",
+      "segments": [
+        "PRI"
+      ],
+      "max_repetitions": 25
+    },
+    "SG34": {
+      "description": "Positionsbezogene Umsatzsteuer",
+      "segments": [
+        "TAX",
+        "MOA"
+      ],
+      "max_repetitions": 99
+    },
+    "SG50": {
+      "description": "Gesamtbeträge der Rechnung (Summenteil nach UNS+S)",
+      "segments": [
+        "MOA"
+      ],
+      "max_repetitions": 100
+    },
+    "SG52": {
+      "description": "Umsatzsteuer-Zusammenfassung auf Rechnungsebene",
+      "segments": [
+        "TAX",
+        "MOA"
+      ],
+      "max_repetitions": 10
+    }
+  },
+  "contract_matching": {
+    "msisdn_phone_number": {
+      "segment": "RFF",
+      "qualifier": "CN",
+      "location": "SG1 (Kopfbereich der Nachricht, vor den NAD-Segmenten)",
+      "format": "NDC/MSISDN = nnnnn/nnnnnnn (z.B. 0172/8900545, 0162/1234567)",
+      "m2m_special": "Bei M2M-Rechnungen steht hier '00000000' - keine Rufnummer verfügbar. IMSI steht im Einzelverbindungsnachweis.",
+      "note": "Format 'NDC/MSISDN' muss ggf. bereinigt werden: z.B. '0172/8900545' -> '+491728900545' via normalize to E.164 (0-prefix → +49, 00-prefix → +)"
+    },
+    "customer_number": {
+      "segment": "RFF",
+      "qualifier": "IT",
+      "location": "SG1 (Kopfbereich, mehrfach wiederholbar)",
+      "format": "an..9 (9-stellig mit führenden Nullen)",
+      "note": "Entspricht der Kundennummer. Auch als Dokumentennummer in BGM für Rechnungen (BGM+380)."
+    },
+    "invoice_number": {
+      "segment": "RFF",
+      "qualifier": "IV",
+      "location": "SG1 (Kopfbereich)",
+      "format": "an..12"
+    },
+    "framework_contract_number": {
+      "segment": "RFF",
+      "qualifier": "ADF",
+      "location": "SG1 (Kopfbereich)",
+      "description": "Rahmenvertragsnummer - relevant für Firmenkunden mit Rahmenverträgen"
+    },
+    "tariff_type": {
+      "segment": "RFF",
+      "qualifier": "RB",
+      "location": "SG1 (Kopfbereich)",
+      "format": "an..5",
+      "note": "Tariftyp für das Abrechnungsmodell des Teilnehmers"
+    },
+    "billing_period": {
+      "start": {
+        "segment": "DTM",
+        "qualifier": "51",
+        "location": "SG0 (Kopfbereich, nach BGM)",
+        "format": "CCYYMMDD (Qualifier 102)"
+      },
+      "end": {
+        "segment": "DTM",
+        "qualifier": "52",
+        "location": "SG0 (Kopfbereich, nach BGM)",
+        "format": "CCYYMMDD (Qualifier 102)"
+      }
+    },
+    "total_costs": {
+      "net_amount": {
+        "segment": "MOA",
+        "qualifier": "340",
+        "location": "SG50 (Summenteil nach UNS+S)",
+        "description": "Gesamtnettobetrag exkl. Mobiles Bezahlen und CallNow-Transfer"
+      },
+      "gross_amount": {
+        "segment": "MOA",
+        "qualifier": "77",
+        "location": "SG50 (Summenteil nach UNS+S)",
+        "description": "Gesamtbruttobetrag inkl. Mobiles Bezahlen und CallNow-Transfer (nur BGM+380)"
+      },
+      "payable_amount": {
+        "segment": "MOA",
+        "qualifier": "9",
+        "location": "SG50 (Summenteil nach UNS+S)",
+        "description": "Zu zahlender Betrag (Kontoauszug-Info)"
+      }
+    }
+  },
+  "parsing_tips": {
+    "provider_detection": [
+      "1. UNB-Segment prüfen: Absender (S002.0004) = 'MDVEDI'",
+      "2. NAD+SU-Segment prüfen: Name enthält 'Vodafone GmbH'",
+      "NIEMALS den Dateinamen zur Provider-Erkennung verwenden"
+    ],
+    "document_type_detection": [
+      "BGM+380 = Rechnung",
+      "BGM+190 = Information zur Vodafone-Nummer (einzelner Teilnehmer)",
+      "BGM+380+...++M2M = M2M/IoT-Rechnung"
+    ],
+    "position_parsing": [
+      "Jede Position beginnt mit LIN+{nummer}",
+      "Erstes IMD: Qualifier 161 = Produktgruppe",
+      "Zweites IMD: Qualifier 128 = Service-Code und Beschreibung",
+      "MOA+66 = Nettobetrag der Position",
+      "TAX+1+VAT+++:::19 = 19% MwSt auf die Position"
+    ],
+    "cost_extraction": [
+      "Positionskosten (Netto): MOA+66 in SG27 nach LIN",
+      "Gesamtkosten (Netto): MOA+340 in SG50 nach UNS+S",
+      "Gesamtkosten (Brutto): MOA+77 in SG50 nach UNS+S",
+      "Rechnungsbetrag (zahlbar): MOA+9 in SG50 nach UNS+S",
+      "MwSt-Betrag: MOA+124 in SG52 nach TAX+7"
+    ],
+    "m2m_handling": [
+      "BGM enthält '++M2M' am Ende",
+      "RFF+CN:00000000 statt echter Rufnummer",
+      "Teilnehmer-ID über IMSI im Einzelverbindungsnachweis (separates EDIFACT-File)",
+      "Format ELMI12 statt ELMI11 in UNH"
+    ]
+  },
+  "example_elmi11": {
+    "description": "Vollständiges Beispiel Standard-Mobilfunk (ELMI11)",
+    "header": [
+      "UNA:+.? '",
+      "UNB+UNOC:1+MDVEDI+Receiver+201506:0828+4711'",
+      "UNH+ELMOD200001+INVOIC:D:01B:UN:ELMI11++1:C'",
+      "BGM+380+023000534'",
+      "DTM+3:20141113:102'",
+      "DTM+51:20141010:102'",
+      "DTM+52:20141109:102'",
+      "PAI+1::31'",
+      "FTX+AAI+++Begründete Einwendungen...'",
+      "FTX+AFU+++Vodafone_BankName:Vodafone_BIC:Vodafone_IBAN'",
+      "RFF+IT:101690580'",
+      "RFF+IV:112161616811'",
+      "RFF+ADF:1122334455'",
+      "NAD+IV+++ABC Invoice GmbH+Hauptstrasse 1+Heiden++50999+DE'",
+      "NAD+SU+++Vodafone GmbH+Postfach?: 40542 Düsseldorf:Ferdinand-Braun-Platz 1+Düsseldorf++40549+DE'",
+      "RFF+VA:DE813113094'",
+      "NAD+II+++Vodafone GmbH+KundenBetreuung 40875 Ratingen++++DE'",
+      "FII+RH+DE68300700109999999999+DEUTDEDDXXX'",
+      "CUX+1:EUR'",
+      "PAT+5++5:1:CD:11'",
+      "DTM+13:20141124:102'"
+    ],
+    "positions": [
+      "LIN+1'",
+      "IMD+B++140:161:91'",
+      "IMD+B++NR100:128:91:Vodafone Red XS inkl. Smartphone'",
+      "QTY+141:1'",
+      "MOA+66:37.8067'",
+      "TAX+1+VAT+++:::19'"
+    ],
+    "summary": [
+      "UNS+S'",
+      "MOA+263:194.93'",
+      "MOA+9:275.91'",
+      "MOA+77:80.98'",
+      "MOA+124:12.93'",
+      "MOA+304:80.98'",
+      "MOA+340:68.05'",
+      "TAX+7+VAT+++:::19'",
+      "MOA+124:12.93'",
+      "MOA+125:68.05'",
+      "TAX+9+VAT+++:::19'",
+      "MOA+125:68.0529:::9'",
+      "UNT+71+ELMOD200001'",
+      "UNZ+2+4711'"
+    ]
+  }
+}

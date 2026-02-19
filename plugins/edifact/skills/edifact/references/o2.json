@@ -1,0 +1,761 @@
+{
+  "provider": "O2/Telefónica",
+  "formats": {
+    "rechnung": {
+      "name": "O2 Rechnung",
+      "release": "D 95A",
+      "version": "1.08",
+      "stand": "22.01.2010",
+      "subset": "ETEB (ehemals VITEB VIAG INTERKOM Vers. 1.4)"
+    },
+    "einzelverb": {
+      "name": "O2 Einzelgesprächsnachweis",
+      "release": "D 99B",
+      "version": "1.08",
+      "stand": "02.02.2010",
+      "subset": "ETEIB / VIMOEV:1:1"
+    }
+  },
+  "message_type": "INVOIC",
+  "unb_sender": "o2 MOBILFUNK",
+  "differences_from_telekom": [
+    "Nur 2 Hierarchieebenen (KTO=Ebene 0 als reines Triggersegment, ABS=Ebene 1 für Gruppierung, ZNR=Ebene 2 für Einzelposition) – Telekom ELFE nutzt 3 aktive Ebenen",
+    "Keine QTY- und DTM-Segmente im Positionsteil der Rechnung (o2-rechnung.txt, Abschnitt 7)",
+    "Einzelgesprächsnachweis: Keine explizite Referenzierung zur übergeordneten Ebene (o2-einzelverb.txt, Abschnitt 7)",
+    "Einzelgesprächsnachweis: Ausgabe der Dauer DTM formatiert als hh:mm:ss (Qualifier 48), kein Formatqualifier 402 mehr",
+    "Mobilfunknummer (IMD-VI4 in Rechnung, IMD-MON in Einzelverb) wird ohne internationale Vorwahl geliefert, einheitlich beginnend mit 0 (z.B. 0179123456), nicht mit +49",
+    "Absenderkennung in UNB: 'o2 MOBILFUNK' statt 'TELEKOM' oder 'TELEKOM DEUTSCHLAND GMBH'",
+    "Syntax-Version: UNOC:4 (O2) vs. UNOC:3 (Telekom ELFE)",
+    "NAD-Qualifier: 'II' und 'IV' in der Rechnung; 'SE' (statt 'SU') und 'IV' im Einzelgesprächsnachweis – Telekom verwendet 'SU' für den Versender",
+    "BGM-Code: '380' (Rechnung) bzw. '130' (Einzelgesprächsnachweis); Rechnungsnummer im Format 'o2/<Nummer>'",
+    "UNH-Nachrichtenversion: '95A' (Rechnung) bzw. '99B' (Einzelgesprächsnachweis); Telekom ELFE nutzt ebenfalls D 95A, aber mit anderem Subset",
+    "UNH beim Einzelgesprächsnachweis enthält Association Assigned Code 'VIMOEV:1:1'",
+    "FTX-Segment im Kopfteil wird von O2 nicht verwendet",
+    "PAT- und DTM-Segment (Zahlungsbedingungen/Zahlungstermin) werden von O2 nicht verwendet",
+    "TAX-Segment im Einzelgesprächsnachweis wird nicht geliefert (keine Umsatzsteuerinformationen in den EVN)",
+    "PRI-Segment (Einzelpreis, SG28) und Positions-RFF (SG29) werden von O2 in der Rechnung nicht verwendet",
+    "QTY im Einzelgesprächsnachweis: Qualifier 'MIN' für Minutenangaben zusätzlich zu '2P' (Kilobyte) und 'EA' (SMS)"
+  ],
+  "segments": {
+    "UNA": {
+      "name": "Trennzeichen-Vorgabe",
+      "description": "Optionales Service-Segment. Definiert die Trennzeichen. O2 verwendet den EDIFACT-Standard: ':+.?*' (Hochkomma als Segment-Terminator).",
+      "status": "optional",
+      "example": "UNA:+.?*'",
+      "elements": {
+        "component_separator": {
+          "value": ":",
+          "description": "Komponentendatenelement-Trenner"
+        },
+        "data_separator": {
+          "value": "+",
+          "description": "Datenelement-Trenner"
+        },
+        "decimal_notation": {
+          "value": ".",
+          "description": "Dezimalzeichen"
+        },
+        "release_indicator": {
+          "value": "?",
+          "description": "Freigabezeichen"
+        },
+        "repetition_separator": {
+          "value": "*",
+          "description": "Wiederholungs-Trenner"
+        },
+        "segment_terminator": {
+          "value": "'",
+          "description": "Segment-Endezeichen"
+        }
+      }
+    },
+    "UNB": {
+      "name": "Interchange Header",
+      "description": "Pflicht-Service-Segment. Absender- und Empfängerkennung der Übertragungsdatei. Kritisch für Provider-Erkennung: S002.0004 enthält 'o2 MOBILFUNK'.",
+      "status": "mandatory",
+      "elements": {
+        "S001.0001": {
+          "name": "Syntax identifier",
+          "value": "UNOC",
+          "description": "Zeichensatz-Kennung. O2 verwendet UNOC (Syntax-Version 4), Telekom nutzt UNOC:3."
+        },
+        "S001.0002": {
+          "name": "Syntax version number",
+          "value": "4",
+          "description": "Syntax-Version 4. Abweichung zu Telekom ELFE mit Version 3."
+        },
+        "S002.0004": {
+          "name": "Interchange sender identification",
+          "value": "o2 MOBILFUNK",
+          "description": "KRITISCH FÜR PROVIDER-ERKENNUNG. Enthält den Bezeichner des Absenders. Exakter Wert: 'o2 MOBILFUNK'. In älteren Versionen auch 'O2 MOBILFUNK' möglich."
+        },
+        "S003.0010": {
+          "name": "Interchange recipient identification",
+          "description": "Code von O2 für den Empfänger / Accountnummer (Kundennummer). Enthält die Kundennummer des Rechnungsempfängers."
+        },
+        "S004.0017": {
+          "name": "Date of preparation",
+          "format": "n8 (CCYYMMDD)",
+          "description": "Datum der Nachrichtenerstellung."
+        },
+        "S004.0019": {
+          "name": "Time of preparation",
+          "format": "n4 (HHMM)",
+          "description": "Uhrzeit der Nachrichtenerstellung."
+        },
+        "0020": {
+          "name": "Interchange control reference",
+          "description": "Referenznummer der Übertragung."
+        }
+      },
+      "examples": {
+        "rechnung": "UNB+UNOC:4+o2 MOBILFUNK+12345678+20100112:1203+02111812032800'",
+        "einzelverb": "UNB+UNOC:4+o2 MOBILFUNK+12345+20100210:1200+2010051012004700'"
+      }
+    },
+    "UNH": {
+      "name": "Message Header",
+      "description": "Beginn der EDIFACT-Nachricht. Enthält Nachrichtentyp und Versionsinformationen.",
+      "status": "mandatory",
+      "elements": {
+        "0062": {
+          "name": "Message reference number",
+          "format": "an..14",
+          "description": "Laufende Nummer der Nachricht."
+        },
+        "S009.0065": {
+          "name": "Message type",
+          "value": "INVOIC",
+          "description": "Nachrichtentyp. Sowohl Rechnung als auch Einzelgesprächsnachweis verwenden INVOIC."
+        },
+        "S009.0052": {
+          "name": "Message version number",
+          "value": "D",
+          "description": "EDIFACT-Versionskenner."
+        },
+        "S009.0054": {
+          "name": "Message release number",
+          "rechnung": "95A",
+          "einzelverb": "99B",
+          "description": "EDIFACT-Release. Unterschied zwischen Rechnung (D 95A) und Einzelgesprächsnachweis (D 99B)."
+        },
+        "S009.0051": {
+          "name": "Controlling agency",
+          "value": "UN",
+          "description": "Kontrollorganisation."
+        },
+        "S016.0115": {
+          "name": "Association assigned code (Einzelverb only)",
+          "value": "VIMOEV",
+          "description": "Nur im Einzelgesprächsnachweis: Subset-Kennung 'VIMOEV:1:1'."
+        }
+      },
+      "examples": {
+        "rechnung": "UNH+1+INVOIC:D:95A:UN'",
+        "einzelverb": "UNH+1+INVOIC:D:99B:UN+++VIMOEV:1:1'"
+      }
+    },
+    "BGM": {
+      "name": "Beginning of message",
+      "description": "Rechnungsnummer. Enthält den Dokumenttyp-Code und die O2-spezifische Rechnungsnummer.",
+      "status": "mandatory",
+      "rechnung": {
+        "description": "Dokumenttyp-Code '380' (Rechnung). Rechnungsnummer im Format 'o2/<Nummer>'.",
+        "example": "BGM+380+o2/1234567890/12'"
+      },
+      "einzelverb": {
+        "description": "Dokumenttyp-Code '130' (Einzelgesprächsnachweis). Rechnungsnummer im Format 'o2/<Nummer>'.",
+        "example": "BGM+130+o2/1234567890'"
+      },
+      "elements": {
+        "C002.1001": {
+          "name": "Document/message name, coded",
+          "rechnung_value": "380",
+          "einzelverb_value": "130",
+          "description": "'380' = Rechnung, '130' = Einzelgesprächsnachweis."
+        },
+        "1004": {
+          "name": "Document/message number",
+          "format": "an..35",
+          "description": "O2-Rechnungsnummer. Format: 'o2/<Kundennummer>/<lfd.Nr>' oder 'o2/<Nummer>'."
+        }
+      }
+    },
+    "DTM": {
+      "name": "Date/time/period",
+      "description": "Datums- und Zeitangaben. Werden für Dokumentendatum, Abrechnungsperiode sowie im Positionsteil (nur Einzelverb) für Startzeit und Dauer verwendet.",
+      "status": "mandatory (im Header), conditional (im Detail)",
+      "qualifiers": {
+        "3": {
+          "name": "Rechnungsdatum",
+          "format": "CCYYMMDD, Formatqualifier 102",
+          "description": "Dokumentendatum der Rechnung/des Einzelverbindungsnachweises.",
+          "example": "DTM+3:20100301:102'"
+        },
+        "155": {
+          "name": "Beginn der Abrechnungsperiode",
+          "format": "CCYYMMDD, Formatqualifier 102",
+          "description": "Startdatum des Abrechnungszeitraums.",
+          "example": "DTM+155:20100201:102'"
+        },
+        "156": {
+          "name": "Ende der Abrechnungsperiode",
+          "format": "CCYYMMDD, Formatqualifier 102",
+          "description": "Enddatum des Abrechnungszeitraums.",
+          "example": "DTM+156:20100228:102'"
+        },
+        "48": {
+          "name": "Dauer (nur Einzelverb, Ebene 1)",
+          "format": "hh:mm:ss (kein Formatqualifier)",
+          "description": "Gesprächsdauer. Abweichung zu Telekom EVA: O2 liefert hh:mm:ss ohne Formatqualifier 402.",
+          "example": "DTM+48:00?:02?:56'"
+        },
+        "163": {
+          "name": "Startzeit (nur Einzelverb, Ebene 1)",
+          "format": "CCYYMMDDHHMMSS oder CCYYMMDD",
+          "description": "Startzeitpunkt des Einzelverbindungsnachweises.",
+          "example": "DTM+163:20100223101322'"
+        }
+      }
+    },
+    "RFF": {
+      "name": "Reference",
+      "description": "Referenznummern im Kopfteil: Rechnungsnummer, Kundennummer und Rahmenvertragsnummer.",
+      "status": "conditional (Segment-Gruppe 1)",
+      "qualifiers": {
+        "IV": {
+          "name": "Rechnungsnummer",
+          "description": "Eindeutige Rechnungsnummer.",
+          "example": "RFF+IV:123455'"
+        },
+        "IT": {
+          "name": "Kundennummer / Accountnummer",
+          "description": "Kundennummer (Accountnummer). Entspricht dem Feld 'account_number' in the application.",
+          "example": "RFF+IT:678'"
+        },
+        "CT": {
+          "name": "Rahmenvertragsnummer",
+          "description": "Framework contract number.",
+          "rechnung_example": "RFF+CT:12345678'",
+          "einzelverb_example": "RFF+CT:(RV 12345678)'"
+        },
+        "Z01": {
+          "name": "Zusatzangaben 1 (nur Rechnung)",
+          "description": "Zusätzliche Referenzangaben. Nur in der Rechnung, nicht im Einzelverb."
+        },
+        "Z02": {
+          "name": "Zusatzangaben 2 (nur Rechnung)",
+          "description": "Zusätzliche Referenzangaben. Nur in der Rechnung, nicht im Einzelverb."
+        }
+      }
+    },
+    "NAD": {
+      "name": "Name and address",
+      "description": "Adressangaben des Versenders (O2) und des Empfängers. Wichtig: O2 Rechnung verwendet Qualifier 'II' für Versender (abweichend vom Einzelverb, das 'SE' verwendet). Telekom verwendet 'SU'.",
+      "status": "conditional (Segment-Gruppe 2)",
+      "qualifiers": {
+        "II": {
+          "name": "Rechnungsversender (O2) – nur in Rechnung",
+          "description": "Absender der Rechnung. Qualifier 'II' wird nur in der Rechnung verwendet.",
+          "elements": {
+            "C080.3036": {
+              "name": "Party name",
+              "value": "o2 (Germany) GmbH & Co OHG",
+              "description": "Firmenname O2."
+            },
+            "3164": {
+              "name": "City name",
+              "value": "Nürnberg",
+              "description": "Stadt des O2-Firmensitzes."
+            },
+            "3251": {
+              "name": "Postcode identification",
+              "value": "90345",
+              "description": "PLZ des O2-Firmensitzes."
+            },
+            "3207": {
+              "name": "Country, coded",
+              "value": "DE",
+              "description": "Land (nur beim Versender)."
+            }
+          },
+          "example": "NAD+II+++o2 (Germany) GmbH & Co OHG+Kundenbetreuung+Nurnberg++90345'"
+        },
+        "SE": {
+          "name": "Versender (O2) – nur im Einzelgesprächsnachweis",
+          "description": "Qualifier 'SE' wird ausschliesslich im Einzelgesprächsnachweis für den O2-Versender verwendet. Abweichung zur Rechnung (dort 'II') und zu Telekom EVA (dort 'SU').",
+          "example": "NAD+SE+++o2 GmbH&Co.+Kundenbetreuung+Nürnberg++90345'"
+        },
+        "IV": {
+          "name": "Rechnungsempfänger / Adressat",
+          "description": "Qualifier 'IV' für den Rechnungsempfänger wird sowohl in Rechnung als auch im Einzelgesprächsnachweis verwendet.",
+          "elements": {
+            "C080.3036": {
+              "name": "Party name",
+              "description": "Firmenname des Rechnungsempfängers."
+            },
+            "C059.3042": {
+              "name": "Street and number",
+              "description": "Strasse und Hausnummer."
+            },
+            "3164": {
+              "name": "City name",
+              "description": "Ort des Rechnungsempfängers."
+            },
+            "3251": {
+              "name": "Postcode identification",
+              "description": "Postleitzahl."
+            }
+          },
+          "example": "NAD+IV+++Musterfirma:Max Müller+Hauptstraße 1:Nebenstraße 2+München++80000'"
+        }
+      }
+    },
+    "TAX": {
+      "name": "Duty/tax/fee details",
+      "description": "Umsatzsteuerangaben. Nur in der Rechnung geliefert, nicht im Einzelgesprächsnachweis.",
+      "rechnung": {
+        "description": "Vorhanden. Qualifier '1' im Header für den Standard-USt-Satz; Qualifier '3' im Summary-Teil für Teilsätze.",
+        "qualifiers": {
+          "1": {
+            "context": "SG6 (Header)",
+            "description": "USt-Satz für die gesamte Rechnung.",
+            "example": "TAX+1+VAT+++:::19'"
+          },
+          "3": {
+            "context": "SG50 (Summary)",
+            "description": "USt-Satz für die Rechnung (Summary-Teil).",
+            "example": "TAX+3+VAT+++:::19'"
+          }
+        },
+        "tax_type": "VAT (Value added tax)"
+      },
+      "einzelverb": {
+        "description": "Umsatzsteuerinformationen werden von O2 im Einzelgesprächsnachweis NICHT geliefert."
+      }
+    },
+    "CUX": {
+      "name": "Currencies",
+      "description": "Währungsangabe. Immer EUR.",
+      "status": "conditional (SG7)",
+      "elements": {
+        "C504.6347": {
+          "value": "1",
+          "description": "Currency detail qualifier."
+        },
+        "C504.6345": {
+          "value": "EUR",
+          "description": "Währungscode ISO 4217."
+        }
+      },
+      "example": "CUX+1:EUR'"
+    },
+    "PAI": {
+      "name": "Payment instructions",
+      "description": "Zahlungsangaben. Nur in der Rechnung vorhanden. Gibt an ob Überweisung oder Lastschrift.",
+      "rechnung": {
+        "description": "Vorhanden. '30' = Überweisung, '3' = Lastschrift, '77' = Kreditkarte.",
+        "example": "PAI+1::30'"
+      },
+      "einzelverb": {
+        "description": "Nicht vorhanden im Einzelgesprächsnachweis."
+      }
+    },
+    "FII": {
+      "name": "Financial institution information",
+      "description": "Bankangaben vom Zahlungsempfänger (Kontonummer + Bankleitzahl). Nur in der Rechnung vorhanden.",
+      "rechnung": {
+        "description": "Vorhanden. Qualifier 'RH' für Zahlungsempfänger.",
+        "example": "FII+RH+5713153+70020270'"
+      },
+      "einzelverb": {
+        "description": "Wird von O2 nicht verwendet."
+      }
+    },
+    "LIN": {
+      "name": "Line Item",
+      "description": "Strukturebenen der Rechnung bzw. der Einzelgesprächsnachweise. Definiert die Hierarchie der Rechnungspositionen.",
+      "status": "mandatory in SG25 (Rechnung) / SG26 (Einzelverb)",
+      "rechnung": {
+        "description": "3 Hierarchieebenen, aber nur 2 aktiv genutzt. Ebene 0 (KTO, DE 1222=0): reines Triggersegment ohne Inhalt. Ebene 1 (ABS, DE 1222=1): Gruppierung nach Leistungsarten (Basispreise, Verbindungen, etc.). Ebene 2 (ZNR, DE 1222=2): einzelne Rechnungsposition.",
+        "elements": {
+          "1082": {
+            "name": "Line item number",
+            "description": "Laufende Nummer."
+          },
+          "C212.7140": {
+            "name": "Item number",
+            "values": [
+              "(leer bei KTO)",
+              "ABS",
+              "ZNR"
+            ],
+            "description": "Ebenenkennung."
+          },
+          "C212.7143": {
+            "name": "Item number type, coded",
+            "value": "VI1",
+            "description": "Typkenner."
+          },
+          "C212.1131": {
+            "name": "Code list qualifier",
+            "value": "VIC",
+            "description": "Codelisten-Qualifier."
+          },
+          "C829.5495": {
+            "name": "Sub-line indicator",
+            "value": "1",
+            "description": "Kennung der Unterebene."
+          },
+          "C829.1082": {
+            "name": "Line item number (parent)",
+            "description": "Laufende Nummer der nächsthöheren Ebene."
+          },
+          "1222": {
+            "name": "Configuration level (Ebenennummer)",
+            "values": [
+              "0",
+              "1",
+              "2"
+            ],
+            "description": "Nummer der Hierarchieebene."
+          }
+        },
+        "examples": [
+          "LIN+1++:KTO:VI1:VIC+1+0'  (Ebene 0, Trigger)",
+          "LIN+2++:ABS:VI1:VIC+1:1+1'  (Ebene 1, Gruppierung)",
+          "LIN+3++:ZNR:VI1:VIC+1:2+2'  (Ebene 2, Einzelposition)"
+        ]
+      },
+      "einzelverb": {
+        "description": "Nur 2 Hierarchieebenen. Ebene 0: Mobilfunknummer-Gruppierung (enthält IMD+MON). Ebene 1: Einzelverbindung (enthält IMD+SRV/TRF, DTM, MOA, LOC). Keine explizite Referenzierung zur übergeordneten Ebene (Abweichung zu Telekom EVA).",
+        "examples": [
+          "LIN+1++++0'  (Ebene 0, Mobilfunknummer)",
+          "LIN+2++++1'  (Ebene 1, Einzelverbindung)"
+        ]
+      }
+    },
+    "IMD": {
+      "name": "Item description",
+      "description": "Positionsbeschreibende Merkmale. Enthält Beschreibungen, Mobilfunknummern und Verbindungsarten. Kritisches Segment for invoice processing.",
+      "status": "conditional in SG25/26",
+      "rechnung": {
+        "item_description_type": "'B' (Code and text)",
+        "code_list_responsible_agency": "VIC",
+        "qualifiers": {
+          "VI2": {
+            "name": "Beschreibung der Rechnungsposition",
+            "de_7008_1": "Beschreibung (z.B. Tarifname mit Gültigkeitsdatum)",
+            "de_7008_2": "Zusatzbeschreibung (DEZUES/DEPOSTR/DEPOSTK)",
+            "description": "Tarifinformation und Positionsbeschreibung auf Ebene 1 und 2.",
+            "example": "IMD+B++:VI2:VIC:o2 Select (10.01.2010 - 10.02.2010)'"
+          },
+          "VI3": {
+            "name": "Mobilfunknummer (Klartextfeld)",
+            "de_7008_1": "Text 'Mobilfunknummer <Nummer>'",
+            "description": "Lesbare Darstellung der Mobilfunknummer als Klartextfeld.",
+            "example": "IMD+B++:VI3:VIC:Mobilfunknummer 01794444444'"
+          },
+          "VI4": {
+            "name": "Mobilfunknummer (maschinenlesbar)",
+            "de_7008_1": "Mobilfunknummer (nur die Nummer, ohne Präfix)",
+            "description": "Maschinenlesbare Mobilfunknummer. Wird OHNE internationale Vorwahl geliefert, einheitlich beginnend mit 0 (z.B. 01792222222). Nur Ebene 2 (ZNR).",
+            "note": "Abweichung zu Telekom: Telekom liefert Rufnummer in anderem Feld/Format.",
+            "example": "IMD+B++:VI4:VIC:01792222222'"
+          },
+          "ohne_qualifier": {
+            "name": "Gruppenüberschrift (Ebene 1)",
+            "de_7008_1": "Überschriftstext (z.B. 'Monatliche(r) Basispreis(e) (ohne MwSt.)')",
+            "description": "Freitext-Beschreibung der Leistungsgruppe auf Ebene 1 (ABS), ohne IMD-Qualifier.",
+            "example": "IMD+B++:::Verbindungen (ohne MwSt.)'"
+          }
+        }
+      },
+      "einzelverb": {
+        "item_description_type": "'F' (Freier Text)",
+        "code_list_responsible_agency": "VI",
+        "qualifiers": {
+          "MON": {
+            "name": "Mobilfunknummer (Ebene 0)",
+            "de_7008_1": "Mobilfunknummer",
+            "description": "Mobilfunknummer auf Ebene 0 (Gruppierungsebene). Ohne internationale Vorwahl, beginnend mit 0. Kann auch mit Landeskennzahl (+49) beginnen, wenn die SIM eine ausländische Nummer hat.",
+            "example": "IMD+F++:MON:VI: 01791234567'"
+          },
+          "SRV": {
+            "name": "Art der Verbindung",
+            "de_7008_1": "Verbindungstyp (z.B. 'SPRACHE', 'WAP / Internet')",
+            "de_7008_2": "Dienst (z.B. 'SMS in andere Netze')",
+            "description": "Klassifizierung des Verbindungstyps auf Ebene 1.",
+            "example": "IMD+F++:SRV:VI:SPRACHE'"
+          },
+          "TRF": {
+            "name": "Tarifgruppe / Preisklasse",
+            "de_7008_1": "Tarifgruppenname",
+            "de_7008_2": "Preisklasse oder Art",
+            "description": "Tarifinformation der Verbindung auf Ebene 1.",
+            "example": "IMD+F++:TRF:VI:Verbindungen zur Mailbox:H'"
+          },
+          "PGR": {
+            "name": "Produktgruppe",
+            "de_7008_1": "Produktgruppe",
+            "de_7008_2": "Produkttarif",
+            "description": "Produktgruppeninfo auf Ebene 1."
+          },
+          "TYP": {
+            "name": "Tarifgruppe (Typ)",
+            "de_7008_1": "Tarifgruppe",
+            "description": "Typ-Klassifizierung auf Ebene 1."
+          }
+        }
+      }
+    },
+    "MOA": {
+      "name": "Monetary amount",
+      "description": "Geldbeträge. Sowohl im Positions- als auch im Summary-Teil. Beträge mit bis zu 4 Dezimalstellen, mit Vorzeichen.",
+      "rechnung": {
+        "detail_section": {
+          "context": "SG26 (Positionsbeträge, Ebene 2/ZNR)",
+          "qualifiers": {
+            "66": {
+              "name": "Positionsbetrag netto",
+              "description": "Nettobetrag der Einzelposition. Hauptbetrag pro Rechnungsposition.",
+              "example": "MOA+66:8.79'"
+            },
+            "203": {
+              "name": "Positionsbetrag brutto",
+              "description": "Bruttobetrag. Mit Code '9' als Statusfeld als Informationsbetrag gekennzeichnet.",
+              "example": "MOA+203:3576.16:::9'"
+            },
+            "38": {
+              "name": "Informationsbetrag pro Position",
+              "description": "Informationsbetrag, immer mit Status '9' (zur Information).",
+              "example": "MOA+38:27.17:::9'"
+            },
+            "132": {
+              "name": "Bruttoleistungen anderer Anbieter",
+              "description": "Positionsbetrag für Bruttoleistungen dritter Anbieter.",
+              "example": "MOA+132:12.34'"
+            }
+          }
+        },
+        "summary_section": {
+          "context": "SG48 (Rechnungsbeträge, Summary)",
+          "qualifiers": {
+            "9": {
+              "name": "Zu zahlender Betrag (brutto)",
+              "description": "Gesamtbetrag der Rechnung brutto. Hauptbetrag für die Zahlung.",
+              "example": "MOA+9:161.15'"
+            },
+            "77": {
+              "name": "Rechnungsbetrag (brutto)",
+              "description": "Rechnungsbetrag brutto.",
+              "example": "MOA+77:104.93'"
+            },
+            "79": {
+              "name": "Nettobetrag",
+              "description": "Nettobetrag der Rechnung.",
+              "example": "MOA+79:90.46'"
+            },
+            "124": {
+              "name": "Umsatzsteuerbetrag",
+              "description": "Betrag der Umsatzsteuer.",
+              "example": "MOA+124:14.47'"
+            },
+            "125": {
+              "name": "Umsatzsteuerpflichtiger Betrag",
+              "description": "Basis für die Umsatzsteuerberechnung.",
+              "example": "MOA+125:90.46'"
+            },
+            "136": {
+              "name": "Zusätzlicher Betrag (brutto)",
+              "description": "Zusätzlicher Bruttobetrag.",
+              "example": "MOA+136:56.22'"
+            },
+            "132": {
+              "name": "Bruttoleistungen anderer Anbieter (Summe)",
+              "description": "Summenbetrag Bruttoleistungen dritter Anbieter.",
+              "example": "MOA+132:12.34'"
+            }
+          }
+        }
+      },
+      "einzelverb": {
+        "detail_section": {
+          "context": "SG27 (Positionsbeträge, Ebene 1)",
+          "qualifiers": {
+            "38": {
+              "name": "Positionsbetrag",
+              "description": "Betrag pro Einzelverbindung.",
+              "example": "MOA+38:1.94'"
+            },
+            "132": {
+              "name": "Bruttoleistungen anderer Anbieter",
+              "description": "Positionsbetrag für Bruttoleistungen dritter Anbieter.",
+              "example": "MOA+132:12.9432'"
+            }
+          }
+        },
+        "summary_section": {
+          "context": "SG50 (Gesamtbetrag, Summary)",
+          "qualifiers": {
+            "79": {
+              "name": "Nettobetrag (Summe der Positionsbeträge)",
+              "description": "Gesamtnettobetrag des Einzelgesprächsnachweises.",
+              "example": "MOA+79:161.15'"
+            },
+            "132": {
+              "name": "Summe Bruttoleistungen anderer Anbieter",
+              "description": "Gesamtsumme Bruttoleistungen dritter Anbieter.",
+              "example": "MOA+132:26.36'"
+            }
+          }
+        }
+      }
+    },
+    "QTY": {
+      "name": "Quantity",
+      "description": "Mengenangaben. Nur im Einzelgesprächsnachweis verwendet. In der Rechnung wird QTY nicht verwendet.",
+      "rechnung": {
+        "description": "Wird von O2 NICHT verwendet (Abweichung zu Telekom ELFE)."
+      },
+      "einzelverb": {
+        "description": "Verwendet für Datenvolumen (GPRS/WAP), SMS-Anzahl und Minutenangaben auf Ebene 1.",
+        "context": "SG26 (Detail)",
+        "elements": {
+          "C186.6063": {
+            "value": "107",
+            "description": "Quantity qualifier 'Einheiten'."
+          },
+          "C186.6060": {
+            "name": "Quantity",
+            "description": "Menge."
+          },
+          "C186.6411": {
+            "name": "Measure unit qualifier",
+            "values": {
+              "2P": "Kilobyte (Datenvolumen GPRS/WAP)",
+              "EA": "Stück / Anzahl (SMS-Versand)",
+              "MIN": "Minuten"
+            },
+            "description": "Mengeneinheit."
+          }
+        },
+        "example": "QTY+107:180:2P'  (180 Kilobyte Datenvolumen)"
+      }
+    },
+    "LOC": {
+      "name": "Place/location identification",
+      "description": "Ortsangaben im Einzelgesprächsnachweis: Ziel- und Quellnummer/-ort der Verbindung. Nicht in der Rechnung vorhanden.",
+      "rechnung": {
+        "description": "Wird von O2 in der Rechnung nicht verwendet."
+      },
+      "einzelverb": {
+        "description": "Enthält gewählte Nummer und Ziel- bzw. Herkunftsort der Verbindung. Segment-Gruppe 33.",
+        "qualifiers": {
+          "8": {
+            "name": "Ziel (Destination)",
+            "description": "Gewählte/Zielrufnummer der Verbindung und Zielort. C517.3225 enthält die Zielnummer, C517.3224 den Zielort.",
+            "example": "LOC+8+9999999:::Hamburg'  oder  LOC+8+01791234567'"
+          },
+          "5": {
+            "name": "Quelle (Source)",
+            "description": "Ursprungsort des Anrufs.",
+            "example": "LOC+5+:::München'"
+          }
+        }
+      }
+    },
+    "FTX": {
+      "name": "Free text",
+      "description": "Freitext. Im Kopfteil der Rechnung für der Rechnung zugeordneten freien Text vorgesehen. Wird von O2 derzeit nicht verwendet.",
+      "rechnung": {
+        "description": "Von O2 nicht verwendet."
+      },
+      "einzelverb": {
+        "description": "Nicht in der Struktur enthalten."
+      }
+    },
+    "UNS": {
+      "name": "Section control",
+      "description": "Abschnittskontrollsegment. Trennt Detail- und Summary-Section.",
+      "status": "mandatory",
+      "elements": {
+        "0081": {
+          "value": "S",
+          "description": "Detail-Summary-Section-Trennung."
+        }
+      },
+      "example": "UNS+S'"
+    },
+    "UNT": {
+      "name": "Message trailer",
+      "description": "Abschluss der EDIFACT-Nachricht. Enthält Segmentanzahl und Nachrichten-Referenznummer.",
+      "status": "mandatory",
+      "elements": {
+        "0074": {
+          "name": "Number of segments in the message",
+          "description": "Anzahl der Segmente in der Nachricht."
+        },
+        "0062": {
+          "name": "Message reference number",
+          "description": "Laufende Nummer der Nachricht (entspricht UNH.0062)."
+        }
+      },
+      "example": "UNT+78+1'"
+    }
+  },
+  "contract_matching": {
+    "sim_number": "O2 überträgt keine explizite SIM/ICCID-Nummer (ICCID) in den EDIFACT-Nachrichten. Es gibt kein IMD-Segment mit SIM-Kartennummer. Contract matching must therefore primär über Mobilfunknummer oder Accountnummer matchen.",
+    "phone_number": "Mobilfunknummer steht in IMD+VI4 (Rechnung, Ebene 2/ZNR) bzw. IMD+MON (Einzelgesprächsnachweis, Ebene 0). Wird OHNE internationale Vorwahl geliefert (beginnt mit 0, z.B. '0179123456'). The '0'-prefix must be converted to '+49' (E.164 normalization). Achtung: IMD+VI3 enthält den Klartext 'Mobilfunknummer <Nummer>' und ist NICHT maschinenlesbar.",
+    "account_number": "Die Kundennummer/Accountnummer steht in RFF+IT im Kopfteil. Zusätzlich ist in UNB+S003.0010 der 'Code von O2 für den Empfänger' eingetragen, der ebenfalls die Accountnummer enthalten kann.",
+    "framework_contract": "Die Rahmenvertragsnummer steht in RFF+CT. Im Einzelgesprächsnachweis im Format '(RV <Nummer>)', in der Rechnung direkt als Nummer.",
+    "matching_priority": [
+      "1. Mobilfunknummer via IMD+VI4 (Rechnung) oder IMD+MON (Einzelverb) – Primär-Match",
+      "2. Accountnummer via RFF+IT – Sekundär-Match",
+      "3. Rahmenvertragsnummer via RFF+CT – Tertiär-Match"
+    ]
+  },
+  "message_structure_overview": {
+    "rechnung": {
+      "header_section": [
+        "UNH",
+        "BGM",
+        "DTM (Datum+Periode)",
+        "PAI",
+        "FTX (ungenutzt)",
+        "SG1: RFF (IV/IT/CT)",
+        "SG2: NAD (II+IV) + FII",
+        "SG5: CTA + COM",
+        "SG6: TAX",
+        "SG7: CUX"
+      ],
+      "detail_section": [
+        "SG25: LIN (KTO/ABS/ZNR) + IMD (VI2/VI3/VI4/Überschrift) + SG26: MOA (66/203/38/132)"
+      ],
+      "summary_section": [
+        "UNS",
+        "SG48: MOA (9/77/79/124/125/136/132) + SG50: TAX + MOA (124/125)",
+        "UNT"
+      ]
+    },
+    "einzelverb": {
+      "header_section": [
+        "UNH",
+        "BGM",
+        "DTM (Datum+Periode)",
+        "SG1: RFF (IV/IT/CT)",
+        "SG2: NAD (SE+IV)",
+        "SG5: CTA + COM",
+        "SG7: CUX"
+      ],
+      "detail_section": [
+        "SG26: LIN (Ebene 0/1) + IMD (MON/SRV/TRF) + QTY + DTM (48 Dauer/163 Start) + SG27: MOA (38/132) + SG33: LOC (8 Ziel/5 Quelle)"
+      ],
+      "summary_section": [
+        "UNS",
+        "SG50: MOA (79/132)",
+        "UNT"
+      ]
+    }
+  }
+}
