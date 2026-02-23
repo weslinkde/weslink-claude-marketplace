@@ -49,8 +49,24 @@
     }
   },
   "known_parent_pages": {
-    "kunden_handbuecher": "01hwq76hz1hrwf3z4wmj77mfh2",
-    "description": "Top-level page for customer handbooks"
+    "kunden_handbuecher": {
+      "id": "01hwq76hz1hrwf3z4wmj77mfh2",
+      "description": "Top-level page for customer handbooks"
+    }
+  },
+  "existing_handbooks": {
+    "kibi_connect": {
+      "url": "https://weslink.kibi.de/wiki/kibi-connect",
+      "description": "Kunden-Handbuch fuer KibiConnect (Kommunikation, Gruppen, Posts, Aufgaben, Wiki, Chat)"
+    },
+    "kibi_scada": {
+      "url": "https://weslink.kibi.de/wiki/kibi-scada",
+      "description": "Kunden-Handbuch fuer Kibi SCADA (Geraeteueberwachung, Monitoring, Alarme)"
+    },
+    "menumobil": {
+      "url": "https://weslink.kibi.de/wiki/menumobil-inductline",
+      "description": "ServicePartner/Hersteller-Handbuch fuer MenuMobil-Geraete (InductLine, ContactLine)"
+    }
   },
   "url_structure": {
     "pattern": "https://weslink.kibi.de/wiki/{slug}",

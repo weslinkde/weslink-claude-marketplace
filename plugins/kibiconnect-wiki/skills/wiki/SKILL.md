@@ -173,6 +173,18 @@ def update_page(page_id, title=None, content_doc=None, status=None):
         return False
 ```
 
+## Existing Handbooks
+
+The wiki contains the following product handbooks:
+
+| Produkt | URL | Beschreibung |
+|---------|-----|--------------|
+| **Kibi Connect** | `https://weslink.kibi.de/wiki/kibi-connect` | Kunden-Handbuch fuer die KibiConnect Plattform (Kommunikation, Gruppen, Posts, Aufgaben, Wiki, Chat) |
+| **Kibi SCADA** | `https://weslink.kibi.de/wiki/kibi-scada` | Kunden-Handbuch fuer die Kibi SCADA Plattform (Geraeteueberwachung, Monitoring, Alarme) |
+| **MenuMobil** | `https://weslink.kibi.de/wiki/menumobil-inductline` | ServicePartner/Hersteller-Handbuch fuer MenuMobil-Geraete (InductLine, ContactLine) |
+
+These are nested under the parent page "Kunden Handbucher" (ID: `01hwq76hz1hrwf3z4wmj77mfh2`).
+
 ## Workflow
 
 1. **Read API key** from memory directory
@@ -205,6 +217,68 @@ When creating multi-page handbooks:
 2. Create child pages with `parent_id` pointing to the main page
 3. Update the main page with `seeAlso` links to all children
 4. Use consistent naming and structure across pages
+
+## Screenshots for Wiki Pages
+
+Wiki pages can include images via the `imageResize` TipTap node. The workflow for adding screenshots:
+
+### 1. Prepare Demo Data
+
+Before taking screenshots, ensure the local environment has clean, representative demo data:
+- Use `./vendor/bin/sail artisan kibi:setup --demo` for base data
+- Create additional demo records via factories or seeders if needed
+- **Demo data rules:**
+  - Use realistic but clearly fictional names (e.g. "Pflegeheim Sonnenschein", "Caterer Musterstadt")
+  - No real customer data, no real IP addresses, no real email addresses
+  - Ensure data looks "full" and representative (not empty lists)
+  - Use varied but plausible values (temperatures, times, device names)
+
+### 2. Take Screenshots with Playwright
+
+Use the Playwright MCP browser tools for automated screenshots:
+
+```
+1. Login via test-login: ./vendor/bin/sail artisan app:test-login
+2. Navigate to the target page via browser_navigate
+3. Wait for page load via browser_wait_for
+4. IMPORTANT: Dismiss any overlays, modals, or toast notifications before capturing
+5. Use browser_take_screenshot with appropriate viewport
+```
+
+**Screenshot quality checklist:**
+- No unwanted overlays, modals, tooltips, or cookie banners visible
+- Data in the screenshot is clean demo data (no real data)
+- The relevant UI area is clearly visible and not cut off
+- Use a consistent viewport size (e.g. 1920x1080)
+- Crop to the relevant area when possible (use element screenshots with `ref`)
+- Dark/light mode consistent across all screenshots
+
+### 3. Upload Images
+
+The Wiki API does **not** have a direct image upload endpoint. Images must be:
+1. Uploaded through the KibiConnect web UI (wiki editor drag & drop)
+2. Or hosted externally and referenced via URL
+
+Once uploaded, use the `imageResize` node in TipTap content:
+
+```python
+def image(src, alt="", width=None):
+    attrs = {"src": src, "alt": alt, "title": None}
+    if width:
+        attrs["width"] = width
+    return {"type": "imageResize", "attrs": attrs}
+```
+
+Add the `image()` helper to your `wiki_helpers.py` when screenshots are needed.
+
+### 4. Image Placement
+
+Place images directly after the heading or paragraph they illustrate:
+```python
+heading(2, text("Dashboard-Übersicht")),
+paragraph(text("Das Dashboard zeigt alle relevanten Informationen auf einen Blick:")),
+image("https://weslink.kibi.de/storage/media/...", "Dashboard Übersicht", width=800),
+```
 
 ## Reference Files
 
