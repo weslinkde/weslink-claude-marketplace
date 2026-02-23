@@ -46,6 +46,22 @@
         "content": "JSON string of TipTap document (optional)",
         "status": "string (optional)"
       }
+    },
+    "upload_media": {
+      "method": "POST",
+      "path": "/media/upload",
+      "description": "Upload an image or file to the media library. When wiki_page_id is provided, the file is placed in the wiki page's media folder.",
+      "content_type": "multipart/form-data",
+      "body": {
+        "file": "binary (required, max 10MB)",
+        "wiki_page_id": "string (optional but recommended - attaches file to wiki page's media folder)"
+      },
+      "response": {
+        "201": "{ url: string, id: string }",
+        "404": "Wiki page not found",
+        "422": "Validation error (missing file, too large, etc.)"
+      },
+      "note": "ALWAYS provide wiki_page_id to store media in the page's folder, not the root."
     }
   },
   "known_parent_pages": {

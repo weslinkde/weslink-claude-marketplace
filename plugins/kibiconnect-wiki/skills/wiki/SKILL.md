@@ -253,23 +253,73 @@ Use the Playwright MCP browser tools for automated screenshots:
 - Crop to the relevant area when possible (use element screenshots with `ref`)
 - Dark/light mode consistent across all screenshots
 
-### 3. Upload Images
+### 3. Upload Images via API
 
-The Wiki API does **not** have a direct image upload endpoint. Images must be:
-1. Uploaded through the KibiConnect web UI (wiki editor drag & drop)
-2. Or hosted externally and referenced via URL
-
-Once uploaded, use the `imageResize` node in TipTap content:
+Upload images via `POST /media/upload` (multipart/form-data). **Always provide `wiki_page_id`** so the file is stored in the wiki page's media folder (not the root).
 
 ```python
+import mimetypes
+
+def upload_image(file_path, wiki_page_id=None):
+    """Upload an image file and return its public URL."""
+    boundary = "----WikiUploadBoundary"
+    filename = file_path.split("/")[-1]
+    mime_type = mimetypes.guess_type(filename)[0] or "image/png"
+
+    with open(file_path, "rb") as f:
+        file_data = f.read()
+
+    body = b""
+    # file field
+    body += f"--{boundary}\r\n".encode()
+    body += f'Content-Disposition: form-data; name="file"; filename="{filename}"\r\n'.encode()
+    body += f"Content-Type: {mime_type}\r\n\r\n".encode()
+    body += file_data
+    body += b"\r\n"
+    # wiki_page_id field
+    if wiki_page_id:
+        body += f"--{boundary}\r\n".encode()
+        body += f'Content-Disposition: form-data; name="wiki_page_id"\r\n\r\n'.encode()
+        body += f"{wiki_page_id}\r\n".encode()
+    body += f"--{boundary}--\r\n".encode()
+
+    req = urllib.request.Request(
+        f"{BASE_URL}/media/upload", data=body,
+        headers={
+            "Authorization": f"Bearer {API_KEY}",
+            "Content-Type": f"multipart/form-data; boundary={boundary}",
+            "Accept": "application/json",
+            "User-Agent": UA,
+        },
+        method="POST"
+    )
+    try:
+        with urllib.request.urlopen(req) as resp:
+            result = json.loads(resp.read().decode("utf-8"))
+            print(f"OK: Uploaded {filename}\n  URL: {result['url']}\n  ID: {result['id']}")
+            return result["url"]
+    except urllib.error.HTTPError as e:
+        print(f"ERROR {e.code}: Upload {filename}")
+        print(e.read().decode("utf-8")[:500])
+        return None
+
 def image(src, alt="", width=None):
+    """TipTap imageResize node for embedding uploaded images."""
     attrs = {"src": src, "alt": alt, "title": None}
     if width:
         attrs["width"] = width
     return {"type": "imageResize", "attrs": attrs}
 ```
 
-Add the `image()` helper to your `wiki_helpers.py` when screenshots are needed.
+Add both `upload_image()` and `image()` helpers to your `wiki_helpers.py` when screenshots are needed.
+
+**Typical workflow:**
+```python
+# 1. Upload screenshot (always attach to wiki page)
+url = upload_image("/tmp/screenshot-dashboard.png", wiki_page_id="01kj4q9q9x...")
+# 2. Embed in TipTap content
+image(url, "Dashboard overview", width=800)
+```
 
 ### 4. Image Placement
 
