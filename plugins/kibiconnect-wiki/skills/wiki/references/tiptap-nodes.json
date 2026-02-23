@@ -1,0 +1,120 @@
+{
+  "description": "TipTap JSON node types supported by the KibiConnect Wiki editor",
+  "document": {
+    "type": "doc",
+    "content": "Array of block-level nodes"
+  },
+  "block_nodes": {
+    "heading": {
+      "type": "heading",
+      "attrs": {
+        "class": "null",
+        "style": "null",
+        "textAlign": "start",
+        "id": "null",
+        "level": "1-6"
+      },
+      "content": "Array of inline nodes (text, marks)"
+    },
+    "paragraph": {
+      "type": "paragraph",
+      "attrs": {
+        "class": "null",
+        "style": "null",
+        "textAlign": "start"
+      },
+      "content": "Array of inline nodes"
+    },
+    "bulletList": {
+      "type": "bulletList",
+      "attrs": {"class": "null", "style": "null"},
+      "content": "Array of listItem nodes"
+    },
+    "orderedList": {
+      "type": "orderedList",
+      "attrs": {"class": "null", "style": "null"},
+      "content": "Array of listItem nodes"
+    },
+    "listItem": {
+      "type": "listItem",
+      "attrs": {"class": "null", "style": "null"},
+      "content": "Array of block nodes (typically paragraph)"
+    },
+    "table": {
+      "type": "table",
+      "content": "Array of tableRow nodes"
+    },
+    "tableRow": {
+      "type": "tableRow",
+      "content": "Array of tableHeader or tableCell nodes"
+    },
+    "tableHeader": {
+      "type": "tableHeader",
+      "attrs": {"colspan": 1, "rowspan": 1, "colwidth": "null"},
+      "content": "Array of block nodes"
+    },
+    "tableCell": {
+      "type": "tableCell",
+      "attrs": {"colspan": 1, "rowspan": 1, "colwidth": "null"},
+      "content": "Array of block nodes"
+    },
+    "callout": {
+      "type": "callout",
+      "attrs": {"type": "info|warning|danger"},
+      "content": "Array of block nodes"
+    },
+    "stepList": {
+      "type": "stepList",
+      "content": "Array of stepItem nodes"
+    },
+    "stepItem": {
+      "type": "stepItem",
+      "content": "Array of block nodes"
+    },
+    "details": {
+      "type": "details",
+      "content": ["detailsSummary", "detailsContent"]
+    },
+    "detailsSummary": {
+      "type": "detailsSummary",
+      "content": "Array of block nodes"
+    },
+    "detailsContent": {
+      "type": "detailsContent",
+      "content": "Array of block nodes"
+    },
+    "imageResize": {
+      "type": "imageResize",
+      "attrs": {"src": "URL", "alt": "string", "title": "string", "width": "number"}
+    },
+    "seeAlso": {
+      "type": "seeAlso",
+      "content": "Array of seeAlsoItem nodes"
+    },
+    "seeAlsoItem": {
+      "type": "seeAlsoItem",
+      "attrs": {"pageId": "Wiki page UUID"},
+      "content": "Array of block nodes (label)"
+    },
+    "codeBlock": {
+      "type": "codeBlock",
+      "attrs": {"language": "string"},
+      "content": "Array of text nodes"
+    }
+  },
+  "inline_nodes": {
+    "text": {
+      "type": "text",
+      "text": "The actual text content",
+      "marks": "Optional array of mark objects"
+    }
+  },
+  "marks": {
+    "bold": {"type": "bold"},
+    "italic": {"type": "italic"},
+    "code": {"type": "code"},
+    "link": {"type": "link", "attrs": {"href": "URL"}},
+    "underline": {"type": "underline"},
+    "strike": {"type": "strike"}
+  }
+}

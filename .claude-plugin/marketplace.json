@@ -12,6 +12,14 @@
       "version": "1.0.0",
       "category": "domain-knowledge",
       "tags": ["edifact", "telekom", "vodafone", "o2", "invoic"]
+    },
+    {
+      "name": "kibiconnect-wiki",
+      "description": "KibiConnect Wiki API integration for creating and managing documentation pages on the Weslink wiki platform (TipTap JSON, handbook creation)",
+      "source": "./plugins/kibiconnect-wiki",
+      "version": "1.0.0",
+      "category": "documentation",
+      "tags": ["wiki", "kibiconnect", "documentation", "tiptap", "handbook"]
     }
   ]
 }

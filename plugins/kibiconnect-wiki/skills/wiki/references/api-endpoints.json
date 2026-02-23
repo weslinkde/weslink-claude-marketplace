@@ -1,0 +1,59 @@
+{
+  "description": "KibiConnect Wiki API endpoints",
+  "base_url": "https://weslink.kibi.de/api/v1",
+  "authentication": {
+    "type": "Bearer token",
+    "header": "Authorization: Bearer {API_KEY}",
+    "note": "API key is stored in the user's Claude memory directory under weslink-wiki-api.md"
+  },
+  "required_headers": {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "note": "User-Agent header is REQUIRED - Cloudflare blocks requests without a browser-like User-Agent"
+  },
+  "endpoints": {
+    "list_pages": {
+      "method": "GET",
+      "path": "/wiki",
+      "description": "List all wiki pages",
+      "response": "Paginated list of wiki page objects"
+    },
+    "get_page": {
+      "method": "GET",
+      "path": "/wiki/{id}",
+      "description": "Get a single wiki page by ID",
+      "response": "Wiki page object with content"
+    },
+    "create_page": {
+      "method": "POST",
+      "path": "/wiki",
+      "description": "Create a new wiki page",
+      "body": {
+        "title": "string (required)",
+        "content": "JSON string of TipTap document (required)",
+        "parent_id": "string (optional, UUID of parent page)",
+        "status": "string (optional, default: published)"
+      },
+      "response": "Created wiki page object with id and slug"
+    },
+    "update_page": {
+      "method": "PUT",
+      "path": "/wiki/{id}",
+      "description": "Update an existing wiki page",
+      "body": {
+        "title": "string (optional)",
+        "content": "JSON string of TipTap document (optional)",
+        "status": "string (optional)"
+      }
+    }
+  },
+  "known_parent_pages": {
+    "kunden_handbuecher": "01hwq76hz1hrwf3z4wmj77mfh2",
+    "description": "Top-level page for customer handbooks"
+  },
+  "url_structure": {
+    "pattern": "https://weslink.kibi.de/wiki/{slug}",
+    "note": "Wiki uses FLAT slugs - NOT nested parent/child paths. Example: /wiki/my-page, NOT /wiki/parent/my-page"
+  }
+}

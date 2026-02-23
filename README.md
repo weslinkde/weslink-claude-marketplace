@@ -33,6 +33,18 @@ EDIFACT INVOIC parsing context for German telecom providers. Gives Claude deep k
 
 **Usage:** Type `/edifact` in Claude Code to activate the skill, or simply mention EDIFACT, segment names (IMD, MOA, DTM, RFF, ...) – Claude will pick it up automatically.
 
+### kibiconnect-wiki
+
+KibiConnect Wiki API integration for creating and managing documentation pages. Provides the complete TipTap JSON content format, API endpoints, and a Python helper pattern for programmatic page creation.
+
+**Usage:** Type `/wiki` in Claude Code to activate the skill. Use when creating handbooks, updating wiki documentation, or managing page hierarchies on the Weslink KibiConnect wiki.
+
+**Key features:**
+- TipTap JSON node reference (headings, tables, callouts, lists, seeAlso links)
+- Python helper module pattern for batch page creation
+- Cloudflare bypass via required User-Agent header
+- Handbook structure pattern (parent + child pages with seeAlso)
+
 ## Adding a New Plugin
 
 ```

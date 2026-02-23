@@ -1,0 +1,7 @@
+{
+  "name": "kibiconnect-wiki",
+  "description": "KibiConnect Wiki API integration for creating and managing documentation pages via the Weslink wiki platform.",
+  "author": {
+    "name": "Weslink GmbH"
+  }
+}
