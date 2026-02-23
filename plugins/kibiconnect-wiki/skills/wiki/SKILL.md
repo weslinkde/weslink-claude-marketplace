@@ -70,11 +70,20 @@ def heading(level, *children):
     }
 
 def bullet_list(*items):
-    """Items can be strings or lists of text nodes"""
+    """Items can be strings, lists of text nodes, or tuples (title, description) for definition-style items"""
     li_nodes = []
     for item in items:
         if isinstance(item, str):
             li_nodes.append({"type": "listItem", "attrs": {"class": None, "style": None}, "content": [paragraph(text(item))]})
+        elif isinstance(item, tuple) and len(item) == 2:
+            # Definition-style: (title, description) -> bold title paragraph + description paragraph
+            title, desc = item
+            title_node = bold(title) if isinstance(title, str) else title
+            desc_node = text(desc) if isinstance(desc, str) else desc
+            li_nodes.append({"type": "listItem", "attrs": {"class": None, "style": None}, "content": [
+                paragraph(title_node),
+                paragraph(desc_node)
+            ]})
         elif isinstance(item, list):
             li_nodes.append({"type": "listItem", "attrs": {"class": None, "style": None}, "content": [paragraph(*item)]})
         else:
@@ -201,6 +210,14 @@ These are nested under the parent page "Kunden Handbucher" (ID: `01hwq76hz1hrwf3
 - Use `details()` for collapsible sections
 - Use `see_also()` with `see_also_item(page_id, label)` to link related pages
 - For mixed inline content (bold + text), pass a list: `[bold("Label: "), text("value")]`
+- **For list items with title + description**, use tuples: `("Title", "Description text")`. This renders the title bold on one line and the description below it. Example:
+  ```python
+  bullet_list(
+      ("REST API aktivieren", "Schaltet die API-Schnittstelle ein oder aus."),
+      ("IP-Einschraenkung", "Wenn aktiviert, koennen nur die angegebenen IPs zugreifen."),
+  )
+  ```
+- **NEVER use `--` or other separators** between title and description in the same paragraph. Always use the tuple pattern or separate paragraphs within a listItem.
 
 ## URL Structure
 
