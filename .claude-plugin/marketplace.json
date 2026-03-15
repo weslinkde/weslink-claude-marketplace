@@ -20,6 +20,14 @@
       "version": "1.0.0",
       "category": "documentation",
       "tags": ["wiki", "kibiconnect", "documentation", "tiptap", "handbook"]
+    },
+    {
+      "name": "local-dev-setup",
+      "description": "Weslink local development setup with shared Docker infrastructure (Traefik, PostgreSQL, Redis), native PHP-FPM + nginx, HTTPS, and git worktree support with automatic domain routing",
+      "source": "./plugins/local-dev-setup",
+      "version": "1.0.0",
+      "category": "developer-tools",
+      "tags": ["infrastructure", "docker", "traefik", "php-fpm", "nginx", "worktree", "local-dev"]
     }
   ]
 }

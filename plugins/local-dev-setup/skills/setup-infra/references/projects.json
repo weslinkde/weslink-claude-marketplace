@@ -1,0 +1,66 @@
+{
+  "projects": [
+    {
+      "slug": "kibi",
+      "name": "Kibi Connect",
+      "root": "~/dev/projects/kibi-connect/kibi",
+      "domain": "kibi.test",
+      "port": 8000,
+      "has_subdomains": true,
+      "docker_services": ["soketi", "livekit"],
+      "db_name": "kibi",
+      "test_db": "saas_test",
+      "needs_horizon": true,
+      "needs_scheduler": true
+    },
+    {
+      "slug": "bessler",
+      "name": "Bessler Backend",
+      "root": "~/dev/projects/bessler/bessler-backend",
+      "domain": "bessler.test",
+      "port": 8001,
+      "has_subdomains": false,
+      "docker_services": [],
+      "db_name": "bessler",
+      "test_db": "bessler_test",
+      "needs_horizon": false,
+      "needs_scheduler": false
+    },
+    {
+      "slug": "scada",
+      "name": "Kibi SCADA",
+      "root": "~/dev/laravel/kibi-scada",
+      "domain": "scada.test",
+      "port": 8002,
+      "has_subdomains": false,
+      "docker_services": [],
+      "db_name": "scada",
+      "test_db": "scada_test",
+      "needs_horizon": true,
+      "needs_scheduler": true
+    },
+    {
+      "slug": "contradoo",
+      "name": "Contradoo",
+      "root": "~/dev/laravel/contradoo",
+      "domain": "contradoo.test",
+      "port": 8003,
+      "has_subdomains": false,
+      "docker_services": [],
+      "db_name": "contradoo",
+      "test_db": "contradoo_test",
+      "needs_horizon": true,
+      "needs_scheduler": true
+    }
+  ],
+  "shared_services": {
+    "postgresql": { "image": "pgvector/pgvector:pg16", "port": 5432, "user": "sail", "password": "password" },
+    "redis": { "image": "redis:alpine", "port": 6379 },
+    "meilisearch": { "image": "getmeili/meilisearch:v1.14.0", "port": 7700 },
+    "mailpit": { "image": "axllent/mailpit:latest", "smtp_port": 1025, "web_port": 8025 },
+    "minio": { "image": "minio/minio:latest", "api_port": 9000, "console_port": 8900, "user": "sail", "password": "password" },
+    "traefik": { "image": "traefik:v3.4", "http_port": 80, "https_port": 443, "dashboard_port": 8080 }
+  },
+  "php_fpm_port": 9090,
+  "worktree_base_port": 8100
+}

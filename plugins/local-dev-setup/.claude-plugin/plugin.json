@@ -1,0 +1,7 @@
+{
+  "name": "local-dev-setup",
+  "description": "Weslink local development setup with shared Docker infrastructure (Traefik, PostgreSQL, Redis), native PHP-FPM + nginx, and git worktree support with automatic domain routing.",
+  "author": {
+    "name": "Weslink GmbH"
+  }
+}
