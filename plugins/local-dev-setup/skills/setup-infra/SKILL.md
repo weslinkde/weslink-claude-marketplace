@@ -38,6 +38,11 @@ Execute each step, verify it works, then move on. Ask the user before running de
 brew install php@8.4 nginx dnsmasq mkcert
 ```
 
+After installation, link php@8.4 as the active PHP version:
+```bash
+brew unlink php && brew link php@8.4 --force
+```
+
 ### Step 2: Remove Valet (if installed)
 
 Check first:
@@ -53,6 +58,11 @@ sudo brew services stop nginx
 sudo brew services stop php
 sudo killall php-fpm 2>/dev/null
 sudo killall nginx 2>/dev/null
+```
+
+Also check for Laravel Herd (blocks port 443, conflicts with Traefik):
+```bash
+# If Herd is installed, uninstall via: Herd app -> Settings -> Uninstall
 ```
 
 ### Step 3: mkcert Root CA
@@ -132,10 +142,32 @@ mv /opt/homebrew/etc/php/8.4/php-fpm.d/valet-fpm.conf \
    /opt/homebrew/etc/php/8.4/php-fpm.d/valet-fpm.conf.disabled 2>/dev/null
 ```
 
-**6.3 Install Redis extension:**
+**6.3 Install all required PHP extensions:**
+
+The Docker containers use these extensions: pgsql, sqlite3, gd, curl, imap, mbstring, xml, zip, bcmath, soap, intl, readline, ldap, msgpack, igbinary, redis, memcached, pcov, imagick. Most are included with php@8.4 via Homebrew. Missing ones need pecl:
+
 ```bash
-/opt/homebrew/opt/php@8.4/bin/pecl install redis
+pecl install redis igbinary msgpack
 ```
+
+memcached needs a manual build:
+```bash
+cd /tmp && pecl download memcached && tar xzf memcached-*.tgz && cd memcached-*/
+phpize && ./configure --with-php-config=/opt/homebrew/opt/php@8.4/bin/php-config \
+  --with-zlib-dir=/opt/homebrew/opt/zlib --with-libmemcached-dir=/opt/homebrew \
+  --enable-memcached-igbinary=yes --enable-memcached-msgpack=yes \
+  --enable-memcached-json=yes --enable-memcached-session=yes --enable-memcached-sasl=yes
+make -j$(sysctl -n hw.ncpu) && make install
+echo "extension=memcached.so" > /opt/homebrew/etc/php/8.4/conf.d/20-memcached.ini
+```
+
+Note: imap and swoole are difficult to compile on macOS but are not actually used by any project. Skip them.
+
+**6.3b Disable pcov by default (enables JIT):**
+```bash
+mv /opt/homebrew/etc/php/8.4/conf.d/20-pcov.ini /opt/homebrew/etc/php/8.4/conf.d/20-pcov.ini.disabled
+```
+pcov can be toggled on/off with the `pcov:on` / `pcov:off` shell aliases (see Step 11).
 
 **6.4 Create performance config** at `/opt/homebrew/etc/php/8.4/conf.d/99-performance.ini`:
 ```ini
@@ -245,6 +277,7 @@ Add to `.zshrc` or `.aliases`:
 - `export PATH="$HOME/dev/infrastructure/bin:$PATH"` for `infra` and `wt` commands
 - Project navigation aliases (`kibi`, `bessler`, `scada`, `ctr`)
 - `dev` / `fast` / `fresh` functions for toggling OPcache and Laravel caches
+- `pcov:on` / `pcov:off` functions for toggling pcov extension (pcov blocks JIT)
 - `kibi:up` / `kibi:down` for complete start/stop including Horizon and Scheduler
 - `wt:create`, `wt:remove`, `wt:list`, `wt:run` aliases for worktree management
 
@@ -258,4 +291,5 @@ After setup, all of these should work:
 - [ ] `curl -sk https://contradoo.test/` returns HTTP 200 or 302
 - [ ] Traefik dashboard at `http://localhost:8080` shows all routers
 - [ ] Mailpit at `http://localhost:8025` is accessible
+- [ ] `php -m | grep redis` shows redis extension is loaded
 - [ ] `psql -h 127.0.0.1 -U sail -d kibi -c "SELECT 1"` works
