@@ -94,12 +94,14 @@ Create `~/dev/infrastructure/` with the following structure. Read `references/pr
 
 **Files to create:**
 
-1. `~/dev/infrastructure/docker-compose.yml` - All shared services (Traefik, PostgreSQL, Redis, MeiliSearch, Mailpit, MinIO) on the `shared-infra` Docker network
+1. `~/dev/infrastructure/docker-compose.yml` - All shared services (Traefik, PostgreSQL, Redis, MeiliSearch, Mailpit, MinIO, Infra Dashboard) on the `shared-infra` Docker network
 2. `~/dev/infrastructure/pgsql/init/01-create-databases.sh` - Creates all project databases on first PostgreSQL start
 3. `~/dev/infrastructure/traefik/dynamic/tls.yml` - Points to the wildcard TLS certificate
-4. `~/dev/infrastructure/traefik/dynamic/<project>.yml` - One routing config per project (routes domain to `host.docker.internal:<port>`)
-5. `~/dev/infrastructure/bin/infra` - CLI helper script (up, down, status, logs, cert-regen)
-6. `~/dev/infrastructure/bin/wt` - Global worktree management script
+4. `~/dev/infrastructure/traefik/dynamic/default.yml` - Catch-all route to the `infra-dashboard` container (priority 1), shows a dashboard for any unknown `.test` domain
+5. `~/dev/infrastructure/traefik/dynamic/<project>.yml` - One routing config per project (routes domain to `host.docker.internal:<port>`)
+6. `~/dev/infrastructure/dashboard/index.html` - Static catch-all dashboard page (displays available projects, active worktrees via Traefik API, and service links)
+7. `~/dev/infrastructure/bin/infra` - CLI helper script (up, down, status, logs, cert-regen)
+8. `~/dev/infrastructure/bin/wt` - Global worktree management script
 
 **Key details:**
 - PostgreSQL uses `pgvector/pgvector:pg16` (superset, works for all projects)

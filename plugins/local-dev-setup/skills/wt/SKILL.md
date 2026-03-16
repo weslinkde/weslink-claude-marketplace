@@ -17,10 +17,11 @@ There are two creation modes: **fast** (default) and **full**.
 wt create calendar-fix
   1. git worktree add .worktrees/calendar-fix -b feature/calendar-fix
   2. Symlinks vendor/, node_modules/, .env to main project
-  3. Generates nginx server config (new port)
-  4. Generates Traefik routing config
-  5. Regenerates TLS certificate with new SAN
-  6. Writes .wt-meta (mode=fast, db=shared)
+  3. Symlinks gitignored SSL certs needed by Vite
+  4. Generates nginx server config (new port)
+  5. Generates Traefik routing config
+  6. Regenerates TLS certificate with new SAN
+  7. Writes .wt-meta (mode=fast, db=shared)
 ```
 
 Result: `https://demo.kibi--calendar-fix.test` is immediately accessible. Shares database with main project. No install step needed.
@@ -33,13 +34,16 @@ Best for: frontend fixes, small bugfixes, CSS changes.
 wt create:full new-migration
   1. git worktree add .worktrees/new-migration -b feature/new-migration
   2. Runs composer install + npm install (own copies)
-  3. Copies .env, adjusts APP_URL and DB_DATABASE
-  4. Creates separate PostgreSQL database (pattern: {project}_wt_{name_underscored})
-  5. Runs php artisan migrate --seed
-  6. Generates nginx server config (new port)
-  7. Generates Traefik routing config
-  8. Regenerates TLS certificate with new SAN
-  9. Writes .wt-meta (mode=full, db={project}_wt_{name_underscored})
+  3. Runs npm run build (Vite assets)
+  4. Copies .env, adjusts APP_URL, DB_DATABASE, CENTRAL_DOMAIN, and SERVER_NAME
+  5. Symlinks gitignored SSL certs needed by Vite
+  6. Creates separate PostgreSQL database (pattern: {project}_wt_{name_underscored})
+  7. Runs php artisan migrate --seed
+  8. For multi-tenant projects (kibi): auto-creates demo tenant
+  9. Generates nginx server config (new port)
+  10. Generates Traefik routing config
+  11. Regenerates TLS certificate with new SAN
+  12. Writes .wt-meta (mode=full, db={project}_wt_{name_underscored})
 ```
 
 Result: `https://demo.kibi--new-migration.test` with its own database, vendor/, and node_modules/.
@@ -100,28 +104,32 @@ wt remove <name>
 2. `git worktree add .worktrees/<name> -b feature/<name> origin/develop`
 3. Symlinks `vendor/` and `node_modules/` to main project (relative symlinks)
 4. Symlinks `.env` to main project
-5. Generates deterministic port from hash of `project-name` (range 8100-8999)
-6. Creates nginx config at `/opt/homebrew/etc/nginx/servers/<project>-wt-<name>.conf`
-7. Creates Traefik config at `~/dev/infrastructure/traefik/dynamic/<project>-wt-<name>.yml`
-8. Regenerates mkcert certificate with new SAN for the worktree domain
-9. Writes `.wt-meta` with `mode=fast`
-10. Reloads nginx
+5. Symlinks gitignored SSL certificates needed by Vite (e.g. `certs/` directory) to main project
+6. Generates deterministic port from hash of `project-name` (range 8100-8999)
+7. Creates nginx config at `/opt/homebrew/etc/nginx/servers/<project>-wt-<name>.conf`
+8. Creates Traefik config at `~/dev/infrastructure/traefik/dynamic/<project>-wt-<name>.yml`
+9. Regenerates mkcert certificate with new SAN for the worktree domain
+10. Writes `.wt-meta` with `mode=fast`
+11. Reloads nginx
 
 ### On `wt create:full` (full mode):
 1. `git fetch origin`
 2. `git worktree add .worktrees/<name> -b feature/<name> origin/develop`
 3. Runs `composer install` (own vendor/)
 4. Runs `npm install` (own node_modules/)
-5. Copies `.env` from main project
-6. Adjusts `APP_URL` and `DB_DATABASE` in the copied `.env`
-7. Creates a separate PostgreSQL database (`{project}_wt_{name_underscored}`)
-8. Runs `php artisan migrate --seed`
-9. Generates deterministic port from hash of `project-name` (range 8100-8999)
-10. Creates nginx config at `/opt/homebrew/etc/nginx/servers/<project>-wt-<name>.conf`
-11. Creates Traefik config at `~/dev/infrastructure/traefik/dynamic/<project>-wt-<name>.yml`
-12. Regenerates mkcert certificate with new SAN for the worktree domain
-13. Writes `.wt-meta` with `mode=full` and `db={project}_wt_{name_underscored}`
-14. Reloads nginx
+5. Runs `npm run build` to compile Vite assets (ensures the worktree serves properly without a running Vite dev server)
+6. Copies `.env` from main project
+7. Adjusts `APP_URL`, `DB_DATABASE`, `CENTRAL_DOMAIN`, and `SERVER_NAME` in the copied `.env` (sets correct worktree domain)
+8. Symlinks gitignored SSL certificates needed by Vite (e.g. `certs/` directory) to main project
+9. Creates a separate PostgreSQL database (`{project}_wt_{name_underscored}`)
+10. Runs `php artisan migrate --seed`
+11. For multi-tenant projects (kibi): auto-creates the demo tenant (`php artisan kibi:create-demo-tenant`)
+12. Generates deterministic port from hash of `project-name` (range 8100-8999)
+13. Creates nginx config at `/opt/homebrew/etc/nginx/servers/<project>-wt-<name>.conf`
+14. Creates Traefik config at `~/dev/infrastructure/traefik/dynamic/<project>-wt-<name>.yml`
+15. Regenerates mkcert certificate with new SAN for the worktree domain
+16. Writes `.wt-meta` with `mode=full` and `db={project}_wt_{name_underscored}`
+17. Reloads nginx
 
 ### On `wt remove`:
 1. Reads `.wt-meta` to determine mode
