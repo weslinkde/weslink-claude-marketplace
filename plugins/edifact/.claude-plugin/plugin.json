@@ -1,5 +1,5 @@
 {
-  "name": "contradoo-edifact",
+  "name": "edifact",
   "description": "EDIFACT INVOIC segment definitions and parsing context for German telecom providers (Telekom, Vodafone, O2/Telefónica).",
   "author": {
     "name": "Weslink GmbH"
